@@ -213,18 +213,15 @@ function computeRisk(studentId){
   const overdue = myHw.filter(h=>h.due_date && h.due_date<todayStr() && h.status!=='graded').length;
   const pending = myHw.filter(h=>h.status==='assigned').length;
   const ungraded = myHw.filter(h=>h.status==='submitted').length;
-  const studyDays = new Set(mySessionsFor(studentId).filter(s=>s.date>=weekStart()).map(s=>s.date));
-  const daysBehind = Math.max(0, 6 - studyDays.size); // ~6 study days expected per week
+  const graded = myHw.filter(h=>h.status==='graded');
+  const gradedWithScore = myHw.filter(h=>h.status==='graded' && h.grade!=null);
+  const avgGrade = gradedWithScore.length ? gradedWithScore.reduce((a,h)=>a+h.grade,0)/gradedWithScore.length : null;
+  // Risk is derived only from what the admin can observe via RLS (homework), not private study logs.
   let level='ontrack', label='On track';
-  if(overdue>=3 || daysBehind>=3){ level='behind'; label='Behind'; }
-  else if(overdue>=1 || daysBehind>=2 || ungraded>=1){ level='attention'; label='Needs attention'; }
-  return { overdue, pending, ungraded, studyDays: studyDays.size, daysBehind, level, label, hwTotal: myHw.length };
-}
-// helper: sessions belong to student's own rows; admin can't read others' study_sessions (RLS).
-// So risk uses only homework (which admin CAN see). Mark as derived-from-homework.
-function mySessionsFor(sid){
-  // Admin RLS blocks reading other users' study_sessions; return own bucket only if it's the admin's own id.
-  return sessions; // safe fallback (admin sees empty unless self)
+  if(!myHw.length){ level='attention'; label='No work assigned'; }
+  else if(overdue>=3){ level='behind'; label='Behind'; }
+  else if(overdue>=1 || ungraded>=2){ level='attention'; label='Needs attention'; }
+  return { overdue, pending, ungraded, graded: graded.length, avgGrade, level, label, hwTotal: myHw.length };
 }
 
 async function renderAdminOverview(){
@@ -250,10 +247,12 @@ async function renderAdminOverview(){
       <div>
         <div class="rc-name">${escape(s.display_name||s.email)} <span class="risk ${r.level}"><span class="dot"></span>${r.label}</span></div>
         <div class="rc-stats">
-          <div class="rc-stat">Homework: <b>${r.hwTotal}</b></div>
+          <div class="rc-stat">Assigned: <b>${r.hwTotal}</b></div>
           <div class="rc-stat">Pending: <b>${r.pending}</b></div>
           <div class="rc-stat">Submitted: <b>${r.ungraded}</b></div>
+          <div class="rc-stat">Graded: <b>${r.graded}</b></div>
           <div class="rc-stat">Overdue: <b>${r.overdue}</b></div>
+          <div class="rc-stat">Avg grade: <b>${r.avgGrade?r.avgGrade.toFixed(0):'—'}</b></div>
         </div>
         <div class="muted small" style="margin-top:4px">${escape(s.email)} · joined ${s.created_at?new Date(s.created_at).toLocaleDateString():'—'}</div>
       </div>

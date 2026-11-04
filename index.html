@@ -7,11 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css?v=8">
-<link rel="stylesheet" href="css/base.css?v=8">
-<link rel="stylesheet" href="css/layout.css?v=8">
-<link rel="stylesheet" href="css/components.css?v=8">
-<link rel="stylesheet" href="css/admin.css?v=8">
+<link rel="stylesheet" href="css/tokens.css?v=9">
+<link rel="stylesheet" href="css/base.css?v=9">
+<link rel="stylesheet" href="css/layout.css?v=9">
+<link rel="stylesheet" href="css/components.css?v=9">
+<link rel="stylesheet" href="css/admin.css?v=9">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -45,7 +45,9 @@
     <button class="active" data-tab="dashboard"><span class="ico">🏠</span> Dashboard</button>
     <button data-tab="assignments"><span class="ico">📋</span> Assignments</button>
     <button data-tab="studylog"><span class="ico">✏️</span> Study Log</button>
+    <button data-tab="errorlog"><span class="ico">🩹</span> Error Log</button>
     <button data-tab="scores"><span class="ico">📈</span> SAT Scores</button>
+    <button data-tab="sessions"><span class="ico">🤝</span> 1:1 Sessions</button>
     <button data-tab="portfolio"><span class="ico">🤖</span> Portfolio</button>
     <div class="nav-sep"></div>
     <button data-tab="schedule"><span class="ico">🗓️</span> Schedule</button>
@@ -93,6 +95,10 @@
         <div class="card"><h2>Upcoming Homework</h2><ul class="list" id="upcomingAssign"></ul></div>
       </div>
       <div class="card"><h2>Weekly Study Hours (last 7 days)</h2><div class="chart" id="weekChart"></div></div>
+      <div class="two-col" style="margin-top:12px">
+        <div class="card"><h2>Focus Areas</h2><p class="muted" style="font-size:12px;margin:-4px 0 8px">Your top open items from the Error Log.</p><div id="dashFocus"></div></div>
+        <div class="card"><h2>Next 1:1 Session</h2><div id="dashNextSession"></div></div>
+      </div>
     </section>
 
     <!-- ASSIGNMENTS -->
@@ -141,6 +147,18 @@
       </div>
     </section>
 
+    <!-- ERROR LOG -->
+    <section id="errorlog" class="section">
+      <div class="page-head"><h2>Error Log</h2><p class="desc">Record every question type or topic you miss. Weakness named is weakness half-beaten.</p></div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <p class="muted" style="margin:0;font-size:13px">Advance an entry as it improves; delete when truly done.</p>
+          <button class="btn" onclick="openErrorModal()">+ Log Weak Point</button>
+        </div>
+        <div id="errorLogList"></div>
+      </div>
+    </section>
+
     <!-- SAT SCORES -->
     <section id="scores" class="section">
       <div class="page-head"><h2>SAT Scores</h2><p class="desc">Log every practice test to watch your trend climb toward 1450.</p></div>
@@ -161,6 +179,27 @@
         <h2>Score History</h2>
         <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Total</th><th>Math</th><th>R&amp;W</th><th>Notes</th><th></th></tr></thead><tbody id="scoreTable"></tbody></table></div>
         <div style="margin-top:14px"><h3>Score Trend</h3><div class="chart" id="scoreChart"></div></div>
+      </div>
+    </section>
+
+    <!-- 1:1 SESSIONS -->
+    <section id="sessions" class="section">
+      <div class="page-head"><h2>1:1 Study Sessions</h2><p class="desc" id="sessionsDesc">Live calendar of your one-on-one sessions with your teacher. When your teacher proposes one, confirm it here.</p></div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <div class="row" style="gap:6px">
+            <button class="btn secondary sm" onclick="shiftMonth(-1)">←</button>
+            <b id="sessionsMonthLabel" style="font-family:var(--font-display)">Month</b>
+            <button class="btn secondary sm" onclick="shiftMonth(1)">→</button>
+          </div>
+          <button class="btn sm" id="addSessionBtn" onclick="openProposeSession()" style="display:none">+ Propose Session</button>
+        </div>
+        <div id="sessionsCalendar"></div>
+        <p class="muted small" id="sessionsHint" style="margin-top:10px"></p>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Upcoming Sessions</h2>
+        <div id="sessionsList"></div>
       </div>
     </section>
 
@@ -217,7 +256,7 @@
       <div class="card" style="margin-top:12px">
         <h2>Day-by-Day Plan</h2>
         <div style="overflow-x:auto;max-height:460px;overflow-y:auto">
-          <table><thead><tr><th>Date</th><th>Phase</th><th>SAT Focus</th><th>Portfolio</th><th>Checkpoint</th></tr></thead><tbody id="dayPlanTable"></tbody></table>
+          <table><thead><tr><th>Date</th><th>Phase</th><th>SAT Focus</th><th>Portfolio</th><th>Resources</th><th>Checkpoint</th></tr></thead><tbody id="dayPlanTable"></tbody></table>
         </div>
       </div>
     </section>
@@ -287,6 +326,8 @@
           <div class="panel"><h3>Study Hours (last 14 days)</h3><div class="chart" id="progressStudyChart"></div></div>
         </div>
         <div class="panel" style="margin-top:10px"><h3>Homework Status</h3><div id="progressHw"></div></div>
+        <div class="panel" style="margin-top:10px"><h3>Open Weak Points (Error Log)</h3><div id="progressWeak"></div></div>
+        <div class="panel" style="margin-top:10px"><h3>1:1 Sessions</h3><div id="progressSessions"></div></div>
         <div class="panel" style="margin-top:10px"><h3>Recent Activity</h3><ul class="list" id="progressActivity"></ul></div>
       </div>
 
@@ -353,8 +394,11 @@
 <div class="modal-back" id="goalModal">
   <div class="modal"><span class="close" onclick="closeModal('goalModal')">&times;</span><h2>Add Goal</h2>
     <div class="field"><label>Goal</label><input id="gText" placeholder="e.g. Score 1300+ on a practice test"></div>
+    <div class="two-col">
+      <div class="field"><label>Type</label><select id="gCat"><option value="realistic">Realistic — this sprint</option><option value="dreamy">Dreamy — the big vision</option></select></div>
+      <div class="field"><label>Priority</label><select id="gPrio"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select></div>
+    </div>
     <div class="field"><label>Target date</label><input type="date" id="gDate"></div>
-    <div class="field"><label>Priority</label><select id="gPrio"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select></div>
     <button class="btn" onclick="saveGoal()">Save</button>
   </div>
 </div>
@@ -405,15 +449,45 @@
   </div>
 </div>
 
+<div class="modal-back" id="errorModal">
+  <div class="modal"><span class="close" onclick="closeModal('errorModal')">&times;</span><h2>Log a Weak Point</h2>
+    <div class="two-col">
+      <div class="field"><label>Subject</label><select id="eSubject"></select></div>
+      <div class="field"><label>Date</label><input type="date" id="eDate"></div>
+    </div>
+    <div class="field"><label>Topic / skill you missed</label><input id="eTopic" placeholder="e.g. Two-way tables, comma splices, inference questions"></div>
+    <div class="field"><label>What specifically tripped you up?</label><textarea id="eDesc" rows="3" placeholder="The mistake pattern, not just the answer."></textarea></div>
+    <div class="field"><label>Status</label><select id="eStatus"></select></div>
+    <button class="btn" onclick="saveErrorEntry()">Save Weak Point</button>
+  </div>
+</div>
+
+<div class="modal-back" id="proposeSessionModal">
+  <div class="modal"><span class="close" onclick="closeModal('proposeSessionModal')">&times;</span><h2>Propose a 1:1 Session</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:12px">The student is notified and must confirm before it's locked in.</p>
+    <div class="field"><label>Student</label><select id="ssStudent"></select></div>
+    <div class="field"><label>Date</label><input type="date" id="ssDate"></div>
+    <div class="two-col">
+      <div class="field"><label>Start time</label><input type="time" id="ssStart"></div>
+      <div class="field"><label>End time</label><input type="time" id="ssEnd"></div>
+    </div>
+    <div class="field"><label>Topic / focus</label><input id="ssTopic" placeholder="e.g. Review Friday test + Algebra drills"></div>
+    <div class="field"><label>Notes / agenda</label><textarea id="ssNotes" rows="3" placeholder="Bring your error log. We'll target..."></textarea></div>
+    <button class="btn" onclick="proposeSession()">Send to Student</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script src="js/config.js?v=8"></script>
-<script src="js/state.js?v=8"></script>
-<script src="js/helpers.js?v=8"></script>
-<script src="js/api.js?v=8"></script>
-<script src="js/auth.js?v=8"></script>
-<script src="js/render.js?v=8"></script>
-<script src="js/admin.js?v=8"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/config.js?v=9"></script>
+<script src="js/state.js?v=9"></script>
+<script src="js/helpers.js?v=9"></script>
+<script src="js/api.js?v=9"></script>
+<script src="js/auth.js?v=9"></script>
+<script src="js/render.js?v=9"></script>
+<script src="js/errorlog.js?v=9"></script>
+<script src="js/sessions.js?v=9"></script>
+<script src="js/admin.js?v=9"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>

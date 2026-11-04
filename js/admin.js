@@ -150,11 +150,16 @@ async function renderProgress(){
   const sid = document.getElementById('progressStudent').value;
   if(!sid) return;
   const [ss, sc, hw] = await Promise.all([
+    sb.from('sessions_1on1').select('*').eq('student_id', sid),
+    sb.from('error_log').select('*').eq('user_id', sid),
     sb.from('study_sessions').select('*').eq('user_id', sid),
+  ]);
+  const sessD = ss.data||[]; const errD = sc.data||[]; const sessionsD = hw.data||[];
+  const [s2, sc2] = await Promise.all([
     sb.from('scores').select('*').eq('user_id', sid),
     sb.from('homework').select('*').eq('assigned_to', sid),
   ]);
-  const sessionsD = ss.data||[]; const scoresD = sc.data||[]; const hwD = hw.data||[];
+  const scoresD = s2.data||[]; const hwD = sc2.data||[];
   const weekH = sessionsD.filter(s=>s.date>=weekStart()).reduce((a,s)=>a+s.hours,0);
   const totalH = sessionsD.reduce((a,s)=>a+s.hours,0);
   const doneHw = hwD.filter(h=>h.status==='graded'||h.status==='submitted').length;
@@ -178,6 +183,20 @@ async function renderProgress(){
   const hwEl=document.getElementById('progressHw');
   if(hwD.length===0) hwEl.innerHTML='<div class="empty">No homework assigned.</div>';
   else hwEl.innerHTML = hwD.map(h=>`<div class="metric"><span class="m-label">${escape(h.title)}</span><div class="progress" style="align-self:center"><div style="width:${h.status==='graded'?100:h.status==='submitted'?60:20}%"></div></div><span class="m-val">${h.status==='graded'?h.grade+'/100':h.status}</span></div>`).join('');
+  // open weak points
+  const weakEl=document.getElementById('progressWeak');
+  if(weakEl){
+    const open = errD.filter(e=>e.status!=='mastered');
+    const mastered = errD.filter(e=>e.status==='mastered').length;
+    if(!errD.length) weakEl.innerHTML='<div class="empty">Learner hasn\u2019t started an error log yet.</div>';
+    else weakEl.innerHTML = `<div class="muted small" style="margin-bottom:6px">${open.length} open · ${mastered} mastered</div>` + (open.length ? open.slice(0,8).map(e=>`<div class="metric"><span class="m-label">${escape(e.subject)}</span><span style="font-size:12px">${escape(e.topic)}</span><span class="m-val"><span class="pill ${e.status==='weak'?'bad':'warn'}">${e.status}</span></span></div>`).join('') : '<div class="callout" style="padding:8px">Everything logged is currently at improving or better.</div>');
+  }
+  // 1:1 sessions
+  const sessEl=document.getElementById('progressSessions');
+  if(sessEl){
+    const upcoming = sessD.filter(s=>s.status!=='cancelled').sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5);
+    sessEl.innerHTML = upcoming.length ? upcoming.map(s=>`<div class="metric"><span class="m-label">${s.date}</span><span style="font-size:12px">${escape(s.topic)}</span><span class="m-val"><span class="pill ${s.status==='confirmed'?'good':'warn'}">${s.status}</span></span></div>`).join('') : '<div class="empty">No 1:1 sessions yet — propose one from the Sessions tab.</div>';
+  }
   const act = document.getElementById('progressActivity');
   const acts = [
     ...sessionsD.slice(0,5).map(s=>({t:s.created_at, txt:`Studied ${s.hours}h — ${s.subject}`, pill:'info'})),

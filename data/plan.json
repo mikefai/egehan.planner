@@ -1,34 +1,113 @@
 [
-  {"d":"2026-11-04","ph":"P1 Baseline","sat":"Diagnostic: Bluebook Test 1 (full, timed). Log score. Start error log.","port":"0.5h: create AI project repo","chk":"Baseline recorded"},
-  {"d":"2026-11-05","ph":"P1 Baseline","sat":"Error review. Math: Heart of Algebra. R&W: punctuation.","port":"0.5h: dataset search","chk":"Weak domains identified"},
-  {"d":"2026-11-06","ph":"P1 Baseline","sat":"Math: Problem Solving & Data Analysis. Reading: Craft & Structure.","port":"0.7h: data pipeline","chk":"Khan plan set"},
-  {"d":"2026-11-07","ph":"P1 Baseline","sat":"Bluebook Test 2. Log & review top 10 mistakes.","port":"—","chk":"Score trend started"},
-  {"d":"2026-11-08","ph":"P1 Baseline","sat":"Drills on weak skills (25 Q). Vocab 15.","port":"0.7h: model skeleton","chk":"Weak-skill drill done"},
-  {"d":"2026-11-09","ph":"P1 Baseline","sat":"Math: Advanced Math (quadratics). R&W: Conventions.","port":"0.7h: training script","chk":"Algebra progress"},
-  {"d":"2026-11-10","ph":"P1 Baseline","sat":"Reading: Evidence & Inference. Math: geometry basics.","port":"0.7h: eval metrics","chk":"Week 1 complete"},
-  {"d":"2026-11-11","ph":"P2 Skills","sat":"Math: quadratics & exponentials. Writing: Expression of Ideas.","port":"0.7h: feature build","chk":"Advanced math"},
-  {"d":"2026-11-12","ph":"P2 Skills","sat":"Reading: central idea. Math: geometry area/volume.","port":"0.7h: portfolio polish","chk":"Reading accuracy up"},
-  {"d":"2026-11-13","ph":"P2 Skills","sat":"Bluebook Test 3. Log, review, categorize.","port":"—","chk":"Mid-point score"},
-  {"d":"2026-11-14","ph":"P2 Skills","sat":"Drills (30 Q). Vocab 15. Grammar units.","port":"0.7h: README","chk":"Grammar covered"},
-  {"d":"2026-11-15","ph":"P2 Skills","sat":"Math: systems of equations. R&W: paired passages.","port":"0.7h: commit & deploy","chk":"Systems mastery"},
-  {"d":"2026-11-16","ph":"P2 Skills","sat":"Math: data analysis scatterplots. Reading: words in context.","port":"0.7h: self-dev reading","chk":"Data analysis solid"},
-  {"d":"2026-11-17","ph":"P2 Skills","sat":"Bluebook Test 4. Review. Update error log.","port":"—","chk":"Week 2 complete"},
-  {"d":"2026-11-18","ph":"P3 Integrate","sat":"Timing: R&W paced. Math: advanced polynomials.","port":"0.7h: feature build","chk":"Pacing on track"},
-  {"d":"2026-11-19","ph":"P3 Integrate","sat":"Math: geometry & trig (unit circle). Reading: inference.","port":"0.7h: code review","chk":"Trig basics"},
-  {"d":"2026-11-20","ph":"P3 Integrate","sat":"Bluebook Test 5. Score, log, review.","port":"—","chk":"Score climbing"},
-  {"d":"2026-11-21","ph":"P3 Integrate","sat":"Error-log mastery: re-attempt all missed.","port":"0.7h: portfolio polish","chk":"Error log cleared"},
-  {"d":"2026-11-22","ph":"P3 Integrate","sat":"Pacing practice (finish 2 min spare). Math: problem solving.","port":"0.7h: self-dev reading","chk":"Timing comfortable"},
-  {"d":"2026-11-23","ph":"P3 Integrate","sat":"Reading: craft & structure. Writing: transitions.","port":"0.7h: feature build","chk":"R&W accuracy up"},
-  {"d":"2026-11-24","ph":"P3 Integrate","sat":"Bluebook Test 6. Full review. Update chart.","port":"—","chk":"Week 3 complete"},
-  {"d":"2026-11-25","ph":"P4 Polish","sat":"Dr. Chung math test 1. Vocab 25 words.","port":"0.7h: finalize v1","chk":"Math ceiling pushed"},
-  {"d":"2026-11-26","ph":"P4 Polish","sat":"Full timed simulation. Error review.","port":"—","chk":"Stamina built"},
-  {"d":"2026-11-27","ph":"P4 Polish","sat":"Light drills. Portfolio finalize.","port":"2h: polish + deploy","chk":"Portfolio v1 done"},
-  {"d":"2026-11-28","ph":"P4 Polish","sat":"Bluebook Test 7 (or repeat weakest). Review.","port":"—","chk":"Consistency check"},
-  {"d":"2026-11-29","ph":"P4 Polish","sat":"Timing + stamina. Weak-skill drills.","port":"0.7h: self-dev reading","chk":"Pace locked"},
-  {"d":"2026-11-30","ph":"P4 Polish","sat":"Final practice test. Vocab 100+ review.","port":"0.7h: final commits","chk":"Final score push"},
-  {"d":"2026-12-01","ph":"P4 Polish","sat":"Light review: error log + vocab. No new content.","port":"—","chk":"Taper begins"},
-  {"d":"2026-12-02","ph":"P5 Taper","sat":"Error log review only (30 min). Vocab flashcards.","port":"0.5h: light reading","chk":"Rest & recover"},
-  {"d":"2026-12-03","ph":"P5 Taper","sat":"Light review only. Sleep 8h. Hydrate.","port":"—","chk":"Test prep"},
-  {"d":"2026-12-04","ph":"P5 Taper","sat":"Pack calculator, ticket, snacks. Visualize. Early sleep.","port":"—","chk":"Ready"},
-  {"d":"2026-12-05","ph":"TEST DAY","sat":"SAT Test Day. Arrive 30 min early. Target 1450+.","port":"—","chk":"🎯 Test Day"}
+  {"d":"2026-11-04","ph":"P1 Baseline","sat":"Diagnostic: Bluebook Test 1 (full, timed). Log score. Start error log.","port":"0.5h: create AI project repo","chk":"Baseline recorded","res":[
+    {"t":"Bluebook (College Board digital SAT app)","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"},
+    {"t":"Khan Academy SAT — start here","u":"https://www.khanacademy.org/sat","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-11-05","ph":"P1 Baseline","sat":"Error review. Math: Heart of Algebra. R&W: punctuation.","port":"0.5h: dataset search","chk":"Weak domains identified","res":[
+    {"t":"Khan — Heart of Algebra","u":"https://www.khanacademy.org/math/sat-math/algebra","m":"Khan","tag":"Khan"},
+    {"t":"Meltzer grammar — punctuation rules","u":"https://www.thecriticalreader.com","m":"Book site","tag":"Grammar"}
+  ]},
+  {"d":"2026-11-06","ph":"P1 Baseline","sat":"Math: Problem Solving & Data Analysis. Reading: Craft & Structure.","port":"0.7h: data pipeline","chk":"Khan plan set","res":[
+    {"t":"Khan — Problem Solving & Data Analysis","u":"https://www.khanacademy.org/math/sat-math/problem-solving-data-analysis","m":"Khan","tag":"Khan"},
+    {"t":"CB Question Bank (filter by skill)","u":"https://www.collegeboard.org/sat/sat-suite/question-bank","m":"Official","tag":"Drills"}
+  ]},
+  {"d":"2026-11-07","ph":"P1 Baseline","sat":"Bluebook Test 2. Log & review top 10 mistakes.","port":"—","chk":"Score trend started","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"},
+    {"t":"1600.io test walkthroughs","u":"https://www.1600.io","m":"Videos","tag":"Video"}
+  ]},
+  {"d":"2026-11-08","ph":"P1 Baseline","sat":"Drills on weak skills (25 Q). Vocab 15.","port":"0.7h: model skeleton","chk":"Weak-skill drill done","res":[
+    {"t":"CB Question Bank","u":"https://www.collegeboard.org/sat/sat-suite/question-bank","m":"Official","tag":"Drills"},
+    {"t":"Khan — Vocabulary / Words in Context","u":"https://www.khanacademy.org/college-careers-more/sat","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-11-09","ph":"P1 Baseline","sat":"Math: Advanced Math (quadratics). R&W: Conventions.","port":"0.7h: training script","chk":"Algebra progress","res":[
+    {"t":"Khan — Advanced Math","u":"https://www.khanacademy.org/math/sat-math/advanced-math","m":"Khan","tag":"Khan"},
+    {"t":"PWN the SAT Math Guide","u":"https://pwnthesat.com","m":"Book","tag":"Book"}
+  ]},
+  {"d":"2026-11-10","ph":"P1 Baseline","sat":"Reading: Evidence & Inference. Math: geometry basics.","port":"0.7h: eval metrics","chk":"Week 1 complete","res":[
+    {"t":"Meltzer — The Critical Reader","u":"https://www.thecriticalreader.com","m":"Book","tag":"Book"},
+    {"t":"Khan — Geometry & Trigonometry","u":"https://www.khanacademy.org/math/sat-math/geometry-trigonometry","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-11-11","ph":"P2 Skills","sat":"Math: quadratics & exponentials. Writing: Expression of Ideas.","port":"0.7h: feature build","chk":"Advanced math","res":[
+    {"t":"Khan — Quadratics","u":"https://www.khanacademy.org/math/sat-math/advanced-math","m":"Khan","tag":"Khan"},
+    {"t":"UWorld SAT (drills)","u":"https://www.uworld.com/sat/","m":"Paid","tag":"Drills","paid":true}
+  ]},
+  {"d":"2026-11-12","ph":"P2 Skills","sat":"Reading: central idea. Math: geometry area/volume.","port":"0.7h: portfolio polish","chk":"Reading accuracy up","res":[
+    {"t":"Khan — Area & Volume","u":"https://www.khanacademy.org/math/sat-math/geometry-trigonometry","m":"Khan","tag":"Khan"},
+    {"t":"CB Question Bank — central idea","u":"https://www.collegeboard.org/sat/sat-suite/question-bank","m":"Official","tag":"Drills"}
+  ]},
+  {"d":"2026-11-13","ph":"P2 Skills","sat":"Bluebook Test 3. Log, review, categorize.","port":"—","chk":"Mid-point score","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"}
+  ]},
+  {"d":"2026-11-14","ph":"P2 Skills","sat":"Drills (30 Q). Vocab 15. Grammar units.","port":"0.7h: README","chk":"Grammar covered","res":[
+    {"t":"Meltzer — Ultimate Guide to SAT Grammar","u":"https://www.thecriticalreader.com","m":"Book","tag":"Grammar"},
+    {"t":"Khan Academy SAT","u":"https://www.khanacademy.org/sat","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-11-15","ph":"P2 Skills","sat":"Math: systems of equations. R&W: paired passages.","port":"0.7h: commit & deploy","chk":"Systems mastery","res":[
+    {"t":"Khan — Systems of Equations","u":"https://www.khanacademy.org/math/sat-math/algebra","m":"Khan","tag":"Khan"},
+    {"t":"1600.io explanations","u":"https://www.1600.io","m":"Videos","tag":"Video"}
+  ]},
+  {"d":"2026-11-16","ph":"P2 Skills","sat":"Math: data analysis scatterplots. Reading: words in context.","port":"0.7h: self-dev reading","chk":"Data analysis solid","res":[
+    {"t":"Khan — Two-Way Tables & Scatterplots","u":"https://www.khanacademy.org/math/sat-math/problem-solving-data-analysis","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-11-17","ph":"P2 Skills","sat":"Bluebook Test 4. Review. Update error log.","port":"—","chk":"Week 2 complete","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"}
+  ]},
+  {"d":"2026-11-18","ph":"P3 Integrate","sat":"Timing: R&W paced. Math: advanced polynomials.","port":"0.7h: feature build","chk":"Pacing on track","res":[
+    {"t":"Khan — Polynomial Arithmetic","u":"https://www.khanacademy.org/math/sat-math/advanced-math","m":"Khan","tag":"Khan"},
+    {"t":"Target Test Prep SAT","u":"https://www.targettestprep.com/sat/","m":"Paid","tag":"Course","paid":true}
+  ]},
+  {"d":"2026-11-19","ph":"P3 Integrate","sat":"Math: geometry & trig (unit circle). Reading: inference.","port":"0.7h: code review","chk":"Trig basics","res":[
+    {"t":"Khan — Right Triangles & Trig","u":"https://www.khanacademy.org/math/sat-math/geometry-trigonometry","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-11-20","ph":"P3 Integrate","sat":"Bluebook Test 5. Score, log, review.","port":"—","chk":"Score climbing","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"}
+  ]},
+  {"d":"2026-11-21","ph":"P3 Integrate","sat":"Error-log mastery: re-attempt all missed.","port":"0.7h: portfolio polish","chk":"Error log cleared","res":[
+    {"t":"CB Question Bank","u":"https://www.collegeboard.org/sat/sat-suite/question-bank","m":"Official","tag":"Drills"},
+    {"t":"1600.io","u":"https://www.1600.io","m":"Videos","tag":"Video"}
+  ]},
+  {"d":"2026-11-22","ph":"P3 Integrate","sat":"Pacing practice (finish 2 min spare). Math: problem solving.","port":"0.7h: self-dev reading","chk":"Timing comfortable","res":[
+    {"t":"Khan — Problem Solving","u":"https://www.khanacademy.org/math/sat-math/problem-solving-data-analysis","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-11-23","ph":"P3 Integrate","sat":"Reading: craft & structure. Writing: transitions.","port":"0.7h: feature build","chk":"R&W accuracy up","res":[
+    {"t":"Meltzer — The Critical Reader","u":"https://www.thecriticalreader.com","m":"Book","tag":"Book"}
+  ]},
+  {"d":"2026-11-24","ph":"P3 Integrate","sat":"Bluebook Test 6. Full review. Update chart.","port":"—","chk":"Week 3 complete","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"}
+  ]},
+  {"d":"2026-11-25","ph":"P4 Polish","sat":"Dr. Chung math test 1. Vocab 25 words.","port":"0.7h: finalize v1","chk":"Math ceiling pushed","res":[
+    {"t":"Dr. John Chung's SAT Math","u":"https://math999.com","m":"Book","tag":"Book"}
+  ]},
+  {"d":"2026-11-26","ph":"P4 Polish","sat":"Full timed simulation. Error review.","port":"—","chk":"Stamina built","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"}
+  ]},
+  {"d":"2026-11-27","ph":"P4 Polish","sat":"Light drills. Portfolio finalize.","port":"2h: polish + deploy","chk":"Portfolio v1 done","res":[
+    {"t":"fast.ai — Practical Deep Learning","u":"https://course.fast.ai","m":"Free course","tag":"AI"},
+    {"t":"Kaggle Learn","u":"https://www.kaggle.com/learn","m":"Free","tag":"AI"}
+  ]},
+  {"d":"2026-11-28","ph":"P4 Polish","sat":"Bluebook Test 7 (or repeat weakest). Review.","port":"—","chk":"Consistency check","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"}
+  ]},
+  {"d":"2026-11-29","ph":"P4 Polish","sat":"Timing + stamina. Weak-skill drills.","port":"0.7h: self-dev reading","chk":"Pace locked","res":[
+    {"t":"CB Question Bank","u":"https://www.collegeboard.org/sat/sat-suite/question-bank","m":"Official","tag":"Drills"}
+  ]},
+  {"d":"2026-11-30","ph":"P4 Polish","sat":"Final practice test. Vocab 100+ review.","port":"0.7h: final commits","chk":"Final score push","res":[
+    {"t":"Bluebook practice tests","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"},
+    {"t":"1600.io vocabulary","u":"https://www.1600.io","m":"Videos","tag":"Video"}
+  ]},
+  {"d":"2026-12-01","ph":"P4 Polish","sat":"Light review: error log + vocab. No new content.","port":"—","chk":"Taper begins","res":[
+    {"t":"Khan Academy SAT","u":"https://www.khanacademy.org/sat","m":"Khan","tag":"Khan"}
+  ]},
+  {"d":"2026-12-02","ph":"P5 Taper","sat":"Error log review only (30 min). Vocab flashcards.","port":"0.5h: light reading","chk":"Rest & recover","res":[
+    {"t":"CS50 — Harvard (portfolio)","u":"https://cs50.harvard.edu/x/","m":"Free","tag":"CS"}
+  ]},
+  {"d":"2026-12-03","ph":"P5 Taper","sat":"Light review only. Sleep 8h. Hydrate.","port":"—","chk":"Test prep","res":[
+    {"t":"SAT Black Book (strategy)","u":"https://thesatblackbook.com","m":"Book","tag":"Book"}
+  ]},
+  {"d":"2026-12-04","ph":"P5 Taper","sat":"Pack calculator, ticket, snacks. Visualize. Early sleep.","port":"—","chk":"Ready","res":[
+    {"t":"College Board — test-day tips","u":"https://collegereadiness.collegeboard.org/sat/taking-the-test","m":"Official","tag":"Test"}
+  ]},
+  {"d":"2026-12-05","ph":"TEST DAY","sat":"SAT Test Day. Arrive 30 min early. Target 1450+.","port":"—","chk":"🎯 Test Day","res":[
+    {"t":"Bluebook (test-day app)","u":"https://collegereadiness.collegeboard.org/digital-salesps/digital-sat-practice","m":"Official","tag":"Test"}
+  ]}
 ]

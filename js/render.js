@@ -93,6 +93,26 @@ function renderDashboard(){
   const days=[]; for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
   const maxH = Math.max(1, ...days.map(d=>sessions.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0)));
   chart.innerHTML = days.map(d=>{const h=sessions.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0);const height=(h/maxH)*150;return `<div class="bar" style="height:${Math.max(4,height)}px"><span class="val">${h?h.toFixed(1):''}</span><span>${d.slice(5)}</span></div>`;}).join('');
+
+  // Focus areas (from error log)
+  const focusEl = document.getElementById('dashFocus');
+  if(focusEl){
+    if(!errorLog.length){ focusEl.innerHTML='<div class="empty">No weak points logged yet — start your Error Log.</div>'; }
+    else {
+      const top = topWeakAreas(4);
+      focusEl.innerHTML = top.length ? top.map(t=>`<div class="list"><li><span>${escape(t.area)}</span><span class="pill warn">${t.count} open</span></li></div>`).join('') : '<div class="empty">All caught up — nothing open. Great job.</div>';
+    }
+  }
+  // Next 1:1 session
+  const nextEl = document.getElementById('dashNextSession');
+  if(nextEl){
+    const upcoming = oneOnOne.filter(s=>s.date>=todayStr() && s.status!=='cancelled').sort((a,b)=>a.date.localeCompare(b.date))[0];
+    if(!upcoming) nextEl.innerHTML='<div class="empty">No upcoming 1:1 sessions.</div>';
+    else {
+      const needConfirm = !isAdmin && upcoming.status==='proposed';
+      nextEl.innerHTML = `<div class="session-item ${upcoming.status}" style="margin:0"><div class="s-when">${new Date(upcoming.date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}${upcoming.start_time?`<div class="muted small">${upcoming.start_time}</div>`:''}</div><div class="s-body"><div class="s-topic">${escape(upcoming.topic)}</div>${statusPill(upcoming)}</div><div class="s-actions">${needConfirm?`<button class="btn sm" onclick="document.querySelector('nav button[data-tab=sessions]').click()">Go confirm</button>`:``}</div></div>`;
+    }
+  }
 }
 
 // ---------- Assignments ----------
@@ -339,7 +359,7 @@ let goalView='list';
 function setGoalView(v){ goalView=v; document.getElementById('goalListBtn').classList.toggle('active',v==='list'); document.getElementById('goalCalBtn').classList.toggle('active',v==='calendar'); renderGoals(); }
 function openGoalModal(){ document.getElementById('goalModal').classList.add('show'); }
 function saveGoal(){
-  const g = { user_id: currentUser.id, text: document.getElementById('gText').value.trim(), due_date: document.getElementById('gDate').value||null, priority: document.getElementById('gPrio').value, done:false };
+  const g = { user_id: currentUser.id, text: document.getElementById('gText').value.trim(), category: document.getElementById('gCat').value, due_date: document.getElementById('gDate').value||null, priority: document.getElementById('gPrio').value, done:false };
   if(!g.text){ toast('Goal required'); return; }
   sb.from('goals').insert(g).then(async ({error})=>{
     if(error){ toast(error.message); return; }
@@ -365,13 +385,28 @@ function renderGoals(){
   const listEl=document.getElementById('goalsList'); const calEl=document.getElementById('goalsCalendar');
   if(goalView==='list'){
     listEl.style.display='block'; calEl.style.display='none';
-    const sorted=[...goals].sort((a,b)=>(a.due_date||'9999').localeCompare(b.due_date||'9999'));
-    if(sorted.length===0){ listEl.innerHTML='<div class="empty">No goals yet</div>'; return; }
-    listEl.innerHTML = sorted.map(g=>{
-      const realIdx = goals.indexOf(g);
-      const overdue = g.due_date && !g.done && g.due_date < todayStr();
-      return `<div class="list"><li><label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1"><input type="checkbox" class="checkbox" ${g.done?'checked':''} onchange="toggleGoal(${realIdx})"><span style="${g.done?'text-decoration:line-through;color:var(--muted)':''}">${escape(g.text)}</span></label>
-      <div class="row" style="gap:6px">${g.due_date?`<span class="pill ${overdue?'bad':g.done?'good':'info'}">${g.due_date}</span>`:'<span class="pill gray">no date</span>'}<span class="pill ${g.priority==='high'?'bad':g.priority==='med'?'warn':'good'}">${g.priority}</span><button class="btn danger sm" onclick="delGoal(${realIdx})">✕</button></div></li></div>`;
+    if(goals.length===0){ listEl.innerHTML='<div class="empty">No goals yet</div>'; return; }
+    const groups = [
+      { key:'realistic', title:'Realistic — this sprint', hint:'Doable in your 31-day window. Checking these off builds unstoppable momentum.', tone:'info' },
+      { key:'dreamy', title:'Dreamy — the reason why', hint:'The bigger vision. These keep the daily work feeling like it means something.' }
+    ];
+    listEl.innerHTML = groups.map(gp=>{
+      const items = goals.filter(g=>(g.category||'realistic')===gp.key);
+      if(!items.length) return '';
+      const doneCount = items.filter(g=>g.done).length;
+      return `<div class="goal-group">
+        <div class="goal-group-head">
+          <h3>${gp.title}</h3>
+          <span class="pill ${gp.key==='dreamy'?'purple':'info'}">${doneCount}/${items.length}</span>
+        </div>
+        ${gp.hint?`<p class="muted" style="font-size:12.5px;margin:-2px 0 8px">${gp.hint}</p>`:''}
+        ${items.map(g=>{
+          const realIdx = goals.indexOf(g);
+          const overdue = g.due_date && !g.done && g.due_date < todayStr();
+          return `<div class="list"><li><label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1"><input type="checkbox" class="checkbox" ${g.done?'checked':''} onchange="toggleGoal(${realIdx})"><span style="${g.done?'text-decoration:line-through;color:var(--muted)':''}">${escape(g.text)}</span></label>
+          <div class="row" style="gap:6px">${g.due_date?`<span class="pill ${overdue?'bad':g.done?'good':'info'}">${g.due_date}</span>`:'<span class="pill gray">no date</span>'}<span class="pill ${g.priority==='high'?'bad':g.priority==='med'?'warn':'good'}">${g.priority}</span><button class="btn danger sm" onclick="delGoal(${realIdx})">✕</button></div></li></div>`;
+        }).join('')}
+      </div>`;
     }).join('');
   } else {
     listEl.style.display='none'; calEl.style.display='block';
@@ -403,6 +438,20 @@ function renderSchedule(){
 }
 
 // ---------- Day plan ----------
+function resourceCell(day){
+  const list = day.res||[];
+  if(!list.length) return '<span class="muted">—</span>';
+  if(list.length===1){
+    const r=list[0];
+    return `<a href="${escape(r.u)}" target="_blank" rel="noopener" class="res-link">${escape(r.t)}${r.paid?' <span class="pill warn">paid</span>':''}</a>`;
+  }
+  // multiple → dropdown that opens the chosen resource
+  return `<select class="res-drop" onchange="if(this.value){window.open(this.value,'_blank');this.selectedIndex=0;}" aria-label="${list.length} resources">
+    <option value="">${list.length} resources ▾</option>
+    ${list.map(r=>`<option value="${escape(r.u)}">${escape(r.t)}${r.paid?' (paid)':''}</option>`).join('')}
+  </select>`;
+}
+
 function renderDayPlan(){
   const tb = document.getElementById('dayPlanTable');
   if(!tb||!window.PLAN||!window.PLAN.length) return;
@@ -414,6 +463,7 @@ function renderDayPlan(){
       <td><span class="pill ${e.ph==='TEST DAY'?'warn':'info'}">${e.ph}</span></td>
       <td style="font-size:12px">${e.sat}</td>
       <td style="font-size:12px">${e.port}</td>
+      <td style="font-size:12px">${resourceCell(e)}</td>
       <td style="font-size:12px">${e.chk}</td>
     </tr>`;
   }).join('');
@@ -431,6 +481,8 @@ function renderAll(){
   renderDashboard();
   renderAssignments();
   renderSessions();
+  renderSessionsCalendar();
+  renderErrorLog();
   renderScores();
   renderPortfolio();
   renderGoals();

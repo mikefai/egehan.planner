@@ -1,0 +1,13 @@
+[
+  {"text":"Hit 3+ study hours on at least 5 days this week — consistency beats intensity.","category":"realistic","due_date":"2026-11-09","priority":"med"},
+  {"text":"Finish Bluebook Tests 1–3 and log every miss in the Error Log.","category":"realistic","due_date":"2026-11-14","priority":"high"},
+  {"text":"Raise Math subscore by ~60 points through targeted Algebra + Data drills.","category":"realistic","due_date":"2026-11-30","priority":"high"},
+  {"text":"Clear all 'weak' items in the Error Log to 'improving' before Dec 1.","category":"realistic","due_date":"2026-12-01","priority":"med"},
+  {"text":"Ship one AI portfolio project (v1) on GitHub with a README.","category":"realistic","due_date":"2026-11-30","priority":"med"},
+  {"text":"Score 1350+ on a full mock by the end of November.","category":"realistic","due_date":"2026-11-30","priority":"high"},
+  {"text":"Score 1450+ on test day — you are building the discipline to earn this.","category":"dreamy","due_date":"2026-12-05","priority":"high"},
+  {"text":"Get into a US university AI/CS program that makes you excited to wake up.","category":"dreamy","due_date":"2027-04-01","priority":"med"},
+  {"text":"Build an AI project that solves a real problem you personally care about.","category":"dreamy","due_date":"2027-01-15","priority":"med"},
+  {"text":"Read one hard English article a day — think like a native reader, not a translator.","category":"dreamy","due_date":"2026-12-05","priority":"low"},
+  {"text":"Become the student professors remember — confident, curious, prepared.","category":"dreamy","due_date":"2027-04-01","priority":"low"}
+]

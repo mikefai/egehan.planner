@@ -2,27 +2,29 @@
 
 async function loadStudentData(){
   try {
-    const [plan, resources, schedule, student] = await Promise.all([
+    const [plan, resources, schedule, student, goalsSeed] = await Promise.all([
       fetch('data/plan.json').then(r=>r.json()),
       fetch('data/resources.json').then(r=>r.json()),
       fetch('data/schedule.json').then(r=>r.json()),
       fetch('data/student.json').then(r=>r.json()),
+      fetch('data/goals-seed.json').then(r=>r.json()),
     ]);
     window.STUDENT = student;
     window.PLAN = plan;
     window.RESOURCES = resources;
     window.SCHEDULE = schedule;
+    window.GOALS_SEED = goalsSeed;
   } catch(e){
     console.warn('Could not load JSON files', e);
     // Fallback so app still runs (e.g. opened via file://)
-    window.PLAN = []; window.RESOURCES = []; window.SCHEDULE = {weekly:[],milestones:[]};
+    window.PLAN = []; window.RESOURCES = []; window.SCHEDULE = {weekly:[],milestones:[]}; window.GOALS_SEED = [];
     window.STUDENT = {displayName:'Egahan Sahban',currentScore:1200,targetScore:1450,testDate:'2026-12-05',dailyStudyHours:3,weeklyPortfolioHours:5};
   }
 }
 
 async function loadAll(){
   const uid = currentUser.id;
-  const [s, sc, p, ps, g, hw, n] = await Promise.all([
+  const [s, sc, p, ps, g, hw, n, el] = await Promise.all([
     sb.from('study_sessions').select('*').eq('user_id', uid).order('date',{ascending:false}),
     sb.from('scores').select('*').eq('user_id', uid).order('date',{ascending:false}),
     sb.from('projects').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
@@ -32,6 +34,7 @@ async function loadAll(){
       ? sb.from('homework').select('*').order('created_at',{ascending:false})
       : sb.from('homework').select('*').eq('assigned_to', uid).order('created_at',{ascending:false}),
     sb.from('notifications').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
+    sb.from('error_log').select('*').eq('user_id', uid).order('date',{ascending:false}),
   ]);
   sessions = s.data||[];
   scores = sc.data||[];
@@ -40,6 +43,22 @@ async function loadAll(){
   goals = g.data||[];
   homework = hw.data||[];
   notifications = n.data||[];
+  errorLog = el.data||[];
+
+  // 1:1 sessions — teacher sees all, student sees their own
+  const sessQ = isAdmin
+    ? sb.from('sessions_1on1').select('*').order('date',{ascending:false})
+    : sb.from('sessions_1on1').select('*').eq('student_id', uid).order('date',{ascending:false});
+  const { data: ss1 } = await sessQ;
+  oneOnOne = ss1||[];
+
+  // Seed built-in goals for a brand-new student account
+  if(!isAdmin && goals.length===0 && window.GOALS_SEED && window.GOALS_SEED.length){
+    const rows = window.GOALS_SEED.map(g=>({ user_id: uid, text: g.text, category: g.category, due_date: g.due_date||null, priority: g.priority||'med', done:false }));
+    await sb.from('goals').insert(rows);
+    const { data: seeded } = await sb.from('goals').select('*').eq('user_id', uid).order('created_at',{ascending:false});
+    goals = seeded||[];
+  }
 
   if(isAdmin){
     const { data: studs } = await sb.from('profiles').select('*').eq('role','student');
@@ -54,6 +73,7 @@ async function loadAll(){
     document.getElementById('hwStudent').innerHTML = opts;
     document.getElementById('progressStudent').innerHTML = opts;
     document.getElementById('dataStudentSel').innerHTML = opts;
+    if(typeof renderSessionStudentOptions==='function') renderSessionStudentOptions();
   } else {
     const ids = homework.map(h=>h.id);
     if(ids.length){
@@ -77,10 +97,18 @@ function subscribeRealtime(){
       .on('postgres_changes', { event:'*', schema:'public', table:'homework' },
         async () => { await loadAll(); renderAll(); })
       .subscribe();
+    sb.channel('sessions-teacher')
+      .on('postgres_changes', { event:'*', schema:'public', table:'sessions_1on1' },
+        async () => { await loadAll(); renderAll(); })
+      .subscribe();
   } else {
     sb.channel('hw-student-channel')
       .on('postgres_changes', { event:'*', schema:'public', table:'homework', filter:`assigned_to=eq.${currentUser.id}` },
         async () => { await loadAll(); renderAll(); toast('Homework updated'); })
+      .subscribe();
+    sb.channel('sessions-student')
+      .on('postgres_changes', { event:'*', schema:'public', table:'sessions_1on1', filter:`student_id=eq.${currentUser.id}` },
+        async () => { await loadAll(); renderAll(); toast('1:1 session updated'); })
       .subscribe();
   }
 }

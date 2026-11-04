@@ -16,3 +16,6 @@ let hwAttachments = {};
 let pendingAttachments = [];
 let realtimeReady = false;
 let loginRunning = false;
+let errorLog = [];
+let oneOnOne = [];
+let oneOnOneMonth = new Date();

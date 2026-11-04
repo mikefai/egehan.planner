@@ -14,3 +14,5 @@ let notifications = [];
 let students = [];
 let hwAttachments = {};
 let pendingAttachments = [];
+let realtimeReady = false;
+let loginRunning = false;

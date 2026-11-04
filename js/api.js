@@ -66,7 +66,8 @@ async function loadAll(){
 }
 
 function subscribeRealtime(){
-  if(!sb) return;
+  if(!sb || realtimeReady) return;
+  realtimeReady = true;
   sb.channel('notif-channel')
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'notifications', filter:`user_id=eq.${currentUser.id}` },
       payload => { notifications.unshift(payload.new); updateNotifBadge(); renderAll(); toast(payload.new.title); })

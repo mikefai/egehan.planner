@@ -46,24 +46,30 @@ async function doAuth(){
 async function doLogout(){ await sb.auth.signOut(); location.reload(); }
 
 async function onLogin(user){
-  currentUser = user;
-  const { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
-  currentProfile = prof;
-  isAdmin = prof?.role === 'admin';
+  if(loginRunning) return;
+  loginRunning = true;
+  try {
+    currentUser = user;
+    const { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    currentProfile = prof;
+    isAdmin = prof?.role === 'admin';
 
-  document.getElementById('userName').textContent = prof?.display_name || user.email;
-  document.getElementById('userAvatar').textContent = (prof?.display_name||user.email).slice(0,2).toUpperCase();
-  const rb = document.getElementById('userRole');
-  rb.textContent = prof?.role||'student';
-  rb.className = 'role-badge '+(prof?.role||'student');
+    document.getElementById('userName').textContent = prof?.display_name || user.email;
+    document.getElementById('userAvatar').textContent = (prof?.display_name||user.email).slice(0,2).toUpperCase();
+    const rb = document.getElementById('userRole');
+    rb.textContent = prof?.role||'student';
+    rb.className = 'role-badge '+(prof?.role||'student');
 
-  if(isAdmin){
-    document.getElementById('adminTab').classList.remove('hidden');
-    const b=document.getElementById('assignHwBtn'); if(b) b.style.display='';
+    if(isAdmin){
+      document.getElementById('adminTab').classList.remove('hidden');
+      const b=document.getElementById('assignHwBtn'); if(b) b.style.display='';
+    }
+
+    showApp();
+    await loadAll();
+    renderAll();
+    subscribeRealtime();
+  } finally {
+    loginRunning = false;
   }
-
-  showApp();
-  await loadAll();
-  renderAll();
-  subscribeRealtime();
 }

@@ -248,16 +248,208 @@ function delScore(id){
   });
 }
 
+// ---- Scores: progress-over-time trajectory ----
+function setScoreSeries(s){
+  scoreSeries = s;
+  document.querySelectorAll('#scores .seg-btn').forEach(b=>b.classList.toggle('active', b.dataset.series===s));
+  renderScores();
+}
+function toggleScoreMilestones(){ renderScores(); }
+
+function seriesConfig(){
+  const st = window.STUDENT||{};
+  if(scoreSeries==='math') return { key:'math', label:'Math', target:750, start:600, assumedStart:true, lo:400, hi:800, unit:'' };
+  if(scoreSeries==='rw')   return { key:'rw',   label:'Reading & Writing', target:750, start:600, assumedStart:true, lo:400, hi:800, unit:'' };
+  return { key:'total', label:'Total', target:(st.targetScore||1450), start:(st.currentScore||1200), assumedStart:false, lo:1000, hi:1600, unit:'' };
+}
+
+function scorePoints(cfg){
+  const st = window.STUDENT||{};
+  const pts = [];
+  if(st.scoreDate) pts.push({ t:new Date(st.scoreDate+'T00:00:00').getTime(), v:cfg.start, baseline:true });
+  [...scores]
+    .filter(s=>s[cfg.key]!=null && !isNaN(+s[cfg.key]))
+    .sort((a,b)=>(a.date||'').localeCompare(b.date||''))
+    .forEach(s=> pts.push({ t:new Date(s.date+'T00:00:00').getTime(), v:+s[cfg.key], id:s.id }));
+  return pts;
+}
+
+// least-squares fit over the non-baseline points
+function fitLine(pts){
+  const d = pts.filter(p=>!p.baseline);
+  if(d.length<2) return null;
+  const n=d.length, t0=d[0].t;
+  let sx=0,sy=0,sxx=0,sxy=0;
+  d.forEach(p=>{ const x=(p.t-t0)/86400000; sx+=x; sy+=p.v; sxx+=x*x; sxy+=x*p.v; });
+  const denom = (n*sxx - sx*sx);
+  if(!denom) return null;
+  const b = (n*sxy - sx*sy)/denom;   // points per day
+  const a = (sy - b*sx)/n;
+  return { a, b, t0 };
+}
+
+function parseMilestones(cfg){
+  if(scoreSeries!=='total' || !window.SCHEDULE || !window.SCHEDULE.milestones) return [];
+  const year = (window.STUDENT && window.STUDENT.testDate ? new Date(window.STUDENT.testDate).getFullYear() : 2026);
+  const MON={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  return window.SCHEDULE.milestones.map(m=>{
+    const mnum = m.target && m.target.match(/→\s*(\d{3,4})/);
+    const dnum = m.label && m.label.match(/(\w+\s+\d+)\s*-\s*(\w+\s+\d+)/);
+    if(!mnum || !dnum) return null;
+    const v=+mnum[1];
+    // end date of range: e.g. "Nov 10"
+    const end = dnum[2]; const em=end.match(/(\w+)\s+(\d+)/);
+    if(!em) return null;
+    const mo=MON[em[1].slice(0,3)]; if(mo==null) return null;
+    const t=new Date(year, mo, +em[2]).getTime();
+    return { v, t, label:m.label };
+  }).filter(Boolean);
+}
+
 function renderScores(){
+  const cfg = seriesConfig();
+  const showMile = document.getElementById('mileToggle') && document.getElementById('mileToggle').checked;
+
+  // ---- history table with delta from previous chronological point ----
   const tb = document.getElementById('scoreTable');
-  const sorted = [...scores].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(sorted.length===0){ tb.innerHTML='<tr><td colspan="6" class="empty">No scores yet</td></tr>'; return; }
-  tb.innerHTML = sorted.map(s=>`<tr><td>${s.date}</td><td><b>${s.total}</b></td><td>${s.math}</td><td>${s.rw}</td><td>${escape(s.notes)}</td><td><button class="btn danger sm" onclick="delScore('${s.id}')">✕</button></td></tr>`).join('');
-  const asc = [...scores].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const chrono = [...scores].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  let prevTotal = (window.STUDENT&&window.STUDENT.currentScore)||null;
+  const deltas = chrono.map(s=>{ const d = (prevTotal!=null && s.total!=null)?(s.total-prevTotal):null; prevTotal = s.total!=null?s.total:prevTotal; return d; });
+  const rows = [...scores].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(rows.length===0){ tb.innerHTML='<tr><td colspan="7" class="empty">No practice tests logged yet.</td></tr>'; }
+  else {
+    tb.innerHTML = rows.map(s=>{
+      const i = chrono.indexOf(s); const d = deltas[i];
+      const dcell = d==null?'<span class="pill gray">—</span>'
+        : d>0?`<span class="pill good">▲ ${d}</span>`
+        : d<0?`<span class="pill bad">▼ ${Math.abs(d)}</span>`
+        : `<span class="pill gray">= 0</span>`;
+      return `<tr><td>${s.date}</td><td><b>${s.total}</b></td><td>${dcell}</td><td>${s.math??'—'}</td><td>${s.rw??'—'}</td><td>${escape(s.notes)}</td><td><button class="btn danger sm" onclick="delScore('${s.id}')">✕</button></td></tr>`;
+    }).join('');
+  }
+
+  // ---- build the trajectory chart ----
   const chart = document.getElementById('scoreChart');
-  if(asc.length===0){ chart.innerHTML=''; return; }
-  const min = Math.min(...asc.map(s=>s.total),1000); const max = Math.max(...asc.map(s=>s.total),1450); const range = max-min||1;
-  chart.innerHTML = asc.map(s=>{ const h=((s.total-min)/range)*150+10; return `<div class="bar" style="height:${h}px"><span class="val">${s.total}</span><span>${s.date.slice(5)}</span></div>`; }).join('');
+  const stats = document.getElementById('scoreStats');
+  const legend = document.getElementById('scoreLegend');
+  const pts = scorePoints(cfg);
+  const testT = new Date(((window.STUDENT&&window.STUDENT.testDate)||'2026-12-05')+'T00:00:00').getTime();
+  const real = pts.filter(p=>!p.baseline);
+
+  // stats + projection
+  const fit = fitLine(pts);
+  const latest = real.length? real[real.length-1].v : (cfg.start);
+  const projected = fit ? Math.round(fit.a + fit.b*((testT-fit.t0)/86400000)) : latest;
+  const gain = real.length ? (latest - cfg.start) : 0;
+  const gap = cfg.target - latest;
+  const firstReal = real.length? real[0].v : null;
+  const trendD = real.length>=2 ? (real[real.length-1].v - real[real.length-2].v) : null;
+
+  if(stats){
+    const trendCls = trendD==null?'':(trendD>0?'up':trendD<0?'down':'');
+    const projCls = projected>=cfg.target?'up':(projected>=latest?'near':'down');
+    stats.innerHTML = `
+      <div class="ts"><div class="ts-v ${trendCls}">${latest}</div><div class="ts-l">Current ${cfg.label}</div></div>
+      <div class="ts"><div class="ts-v ${gain>0?'up':gain<0?'down':''}">${gain>=0?'+':''}${gain}</div><div class="ts-l">vs baseline</div></div>
+      <div class="ts"><div class="ts-v ${trendD==null?'':(trendD>0?'up':'down')}">${trendD==null?'—':(trendD>0?'+':'')+trendD}</div><div class="ts-l">Last change</div></div>
+      <div class="ts"><div class="ts-v ${projCls}">${fit?projected:'—'}</div><div class="ts-l">Projected on test day</div></div>
+      <div class="ts"><div class="ts-v ${gap<=0?'up':'near'}">${gap<=0?'✓ reached':gap}</div><div class="ts-l">To target ${cfg.target}</div></div>`;
+  }
+
+  if(!real.length){
+    chart.innerHTML = `<svg viewBox="0 0 720 300" role="img" aria-label="Score trajectory, no data yet">
+      <rect x="0" y="0" width="720" height="300" fill="transparent"></rect>
+      <text x="360" y="150" text-anchor="middle" class="empty-note">Log your first practice test to start your trajectory.</text>
+      <text x="360" y="172" text-anchor="middle" class="axis-txt">Baseline ${cfg.label} shown as a dashed line — every logged test becomes a point.</text>
+    </svg>`;
+    if(legend) legend.innerHTML='';
+    return;
+  }
+
+  // scales
+  const allV = [latest, projected, cfg.target, cfg.start].filter(v=>v!=null);
+  let yMin = Math.min(cfg.lo, ...allV); let yMax = Math.max(cfg.hi, ...allV, ...real.map(p=>p.v));
+  if(scoreSeries!=='total'){ yMin = cfg.lo; yMax = cfg.hi; }
+  else { yMin = Math.min(1100, yMin); yMax = Math.max(1500, yMax, projected); }
+  const yPad = (yMax-yMin)*0.08||10; yMin-=yPad; yMax+=yPad;
+  let xMin = Math.min(pts[0].t, showMile?Math.min(...parseMilestones(cfg).map(m=>m.t),xMin):pts[0].t); xMin=Math.min(pts[0].t, testT - 0); 
+  xMin = Math.min(...pts.map(p=>p.t));
+  const xMax = testT;
+  const spanX = (xMax-xMin)||1;
+  const W=720,H=300,PADL=46,PADR=18,PADT=16,PADB=34;
+  const X = t => PADL + ((t-xMin)/spanX)*(W-PADL-PADR);
+  const Y = v => H-PADB - ((v-yMin)/(yMax-yMin))*(H-PADT-PADB);
+
+  // gridlines + y labels (5 ticks)
+  let g=''; const ticks=5;
+  for(let i=0;i<=ticks;i++){ const v=yMin+(yMax-yMin)*i/ticks; const y=Y(v);
+    g+=`<line x1="${PADL}" x2="${W-PADR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" class="grid"></line>`+
+       `<text x="${PADL-8}" y="${(y+3).toFixed(1)}" text-anchor="end" class="axis-txt">${Math.round(v)}</text>`;
+  }
+
+  // x labels: a few dates
+  let xlab=''; const nx=Math.min(5, pts.length); 
+  for(let i=0;i<nx;i++){ const p=pts[Math.round(i*(pts.length-1)/Math.max(1,nx-1))]; const dt=new Date(p.t);
+    xlab+=`<text x="${X(p.t).toFixed(1)}" y="${H-12}" text-anchor="middle" class="axis-txt">${dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</text>`;
+  }
+
+  // target line
+  const ty=Y(cfg.target);
+  let targetLine=`<line x1="${PADL}" x2="${W-PADR}" y1="${ty.toFixed(1)}" y2="${ty.toFixed(1)}" class="tline"></line>`+
+    `<text x="${W-PADR}" y="${(ty-5).toFixed(1)}" text-anchor="end" class="tlabel">Target ${cfg.target}</text>`;
+
+  // baseline (start) line
+  let baseLine = cfg.start!=null && cfg.start>=yMin ? `<line x1="${PADL}" x2="${W-PADR}" y1="${Y(cfg.start).toFixed(1)}" y2="${Y(cfg.start).toFixed(1)}" class="bline"></line>` : '';
+
+  // area + line path over the points (chronological)
+  const ordered=[...pts].sort((a,b)=>a.t-b.t);
+  let line='', area='';
+  ordered.forEach((p,i)=>{ const x=X(p.t).toFixed(1), y=Y(p.v).toFixed(1);
+    line += (i===0?`M ${x} ${y}`:` L ${x} ${y}`);
+    area += (i===0?`M ${x} ${Y(yMin).toFixed(1)} L ${x} ${y}`:` L ${x} ${y}`);
+  });
+  const lastP=ordered[ordered.length-1];
+  area += ` L ${X(lastP.t).toFixed(1)} ${Y(yMin).toFixed(1)} Z`;
+
+  // projection to test day
+  let proj='';
+  if(fit && lastP.t < testT){
+    const pv = fit.a + fit.b*((testT-fit.t0)/86400000);
+    const pvy = Math.max(yMin, Math.min(yMax, pv));
+    proj=`<line x1="${X(lastP.t).toFixed(1)}" y1="${Y(lastP.v).toFixed(1)}" x2="${X(testT).toFixed(1)}" y2="${Y(pvy).toFixed(1)}" class="proj"></line>`+
+         `<text x="${X(testT).toFixed(1)}" y="${(Y(pvy)-6).toFixed(1)}" text-anchor="end" class="projlabel">${Math.round(pv)}</text>`;
+  }
+
+  // checkpoints
+  let mile='';
+  if(showMile && scoreSeries==='total'){
+    parseMilestones(cfg).forEach(m=>{ const x=X(m.t).toFixed(1), y=Y(m.v).toFixed(1);
+      mile+=`<path d="M ${x} ${(y-4).toFixed(1)} l 4 4 l -4 4 l -4 -4 z" class="mile"></path>`+
+            `<text x="${x}" y="${(y-8).toFixed(1)}" text-anchor="middle" class="mile-txt">${m.v}</text>`;
+    });
+  }
+
+  // points
+  let dots='';
+  ordered.forEach(p=>{ const x=X(p.t).toFixed(1), y=Y(p.v).toFixed(1);
+    dots += `<circle cx="${x}" cy="${y}" r="4" class="pt"></circle>`;
+  });
+  const cur = ordered[ordered.length-1];
+  dots += `<circle cx="${X(cur.t).toFixed(1)}" cy="${Y(cur.v).toFixed(1)}" r="5.5" class="pt-cur"></circle>`;
+
+  chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${cfg.label} score trajectory">
+    ${g}${xlab}${baseLine}${targetLine}${mile}
+    <path d="${area}" class="area"></path>
+    <path d="${line}" class="line"></path>
+    ${proj}${dots}
+  </svg>`;
+
+  if(legend){
+    const items=[['Solid line','var(--primary)','scored trajectory'],['Dashed violet','var(--violet)','projected pace'],['Green dashed','var(--success)','target']];
+    if(cfg.assumedStart) items.push(['Baseline dashed','var(--line-strong)','assumed section baseline']);
+    if(showMile && scoreSeries==='total') items.push(['Diamond','var(--warn)','plan checkpoint']);
+    legend.innerHTML = items.map(it=>`<span class="lg"><span class="sw" style="border-top-color:${it[1]}"></span>${it[2]}</span>`).join('');
+  }
 }
 
 // ---------- Portfolio ----------

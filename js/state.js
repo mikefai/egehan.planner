@@ -19,3 +19,4 @@ let loginRunning = false;
 let errorLog = [];
 let oneOnOne = [];
 let oneOnOneMonth = new Date();
+let scoreSeries = 'total';

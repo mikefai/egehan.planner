@@ -7,11 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css?v=9">
-<link rel="stylesheet" href="css/base.css?v=9">
-<link rel="stylesheet" href="css/layout.css?v=9">
-<link rel="stylesheet" href="css/components.css?v=9">
-<link rel="stylesheet" href="css/admin.css?v=9">
+<link rel="stylesheet" href="css/tokens.css?v=11">
+<link rel="stylesheet" href="css/base.css?v=11">
+<link rel="stylesheet" href="css/layout.css?v=11">
+<link rel="stylesheet" href="css/components.css?v=11">
+<link rel="stylesheet" href="css/admin.css?v=11">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -118,9 +118,9 @@
           </div>
         </div>
         <div class="kanban">
-          <div class="kanban-col"><h4>To Do</h4><div id="col-todo"></div></div>
-          <div class="kanban-col"><h4>In Progress</h4><div id="col-doing"></div></div>
-          <div class="kanban-col"><h4>Done</h4><div id="col-done"></div></div>
+          <div class="kanban-col"><h3 class="kanban-h">To Do</h3><div id="col-todo"></div></div>
+          <div class="kanban-col"><h3 class="kanban-h">In Progress</h3><div id="col-doing"></div></div>
+          <div class="kanban-col"><h3 class="kanban-h">Done</h3><div id="col-done"></div></div>
         </div>
       </div>
     </section>
@@ -161,24 +161,40 @@
 
     <!-- SAT SCORES -->
     <section id="scores" class="section">
-      <div class="page-head"><h2>SAT Scores</h2><p class="desc">Log every practice test to watch your trend climb toward 1450.</p></div>
+      <div class="page-head"><h2>SAT Scores</h2><p class="desc">Every practice test is a data point. This is your trajectory toward the target by December 5.</p></div>
+
       <div class="card">
-        <h2>Log a Practice Test Score</h2>
-        <div class="two-col">
-          <div class="field"><label>Date</label><input type="date" id="scoreDate"></div>
-          <div class="field"><label>Total (400-1600)</label><input type="number" min="400" max="1600" id="scoreTotal" placeholder="1200"></div>
+        <div class="score-controls">
+          <div class="seg" role="group" aria-label="Score series">
+            <button class="seg-btn active" data-series="total" onclick="setScoreSeries('total')">Total</button>
+            <button class="seg-btn" data-series="math" onclick="setScoreSeries('math')">Math</button>
+            <button class="seg-btn" data-series="rw" onclick="setScoreSeries('rw')">Reading &amp; Writing</button>
+          </div>
+          <label class="mile-toggle"><input type="checkbox" id="mileToggle" class="checkbox" onchange="toggleScoreMilestones()"> Show plan checkpoints</label>
         </div>
-        <div class="two-col">
-          <div class="field"><label>Math (200-800)</label><input type="number" min="200" max="800" id="scoreMath" placeholder="600"></div>
-          <div class="field"><label>R&amp;W (200-800)</label><input type="number" min="200" max="800" id="scoreRW" placeholder="600"></div>
-        </div>
-        <div class="field"><label>Test name / notes</label><input type="text" id="scoreNotes" placeholder="Bluebook Practice Test 4"></div>
-        <button class="btn" onclick="addScore()">Log Score</button>
+        <div class="score-stats" id="scoreStats"></div>
+        <div class="score-chart-wrap"><div id="scoreChart" class="score-chart"></div></div>
+        <div class="chart-legend" id="scoreLegend"></div>
       </div>
-      <div class="card" style="margin-top:12px">
-        <h2>Score History</h2>
-        <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Total</th><th>Math</th><th>R&amp;W</th><th>Notes</th><th></th></tr></thead><tbody id="scoreTable"></tbody></table></div>
-        <div style="margin-top:14px"><h3>Score Trend</h3><div class="chart" id="scoreChart"></div></div>
+
+      <div class="two-col" style="margin-top:12px">
+        <div class="card">
+          <h2>Log a Practice Test Score</h2>
+          <div class="two-col">
+            <div class="field"><label>Date</label><input type="date" id="scoreDate"></div>
+            <div class="field"><label>Total (400-1600)</label><input type="number" min="400" max="1600" id="scoreTotal" placeholder="1200"></div>
+          </div>
+          <div class="two-col">
+            <div class="field"><label>Math (200-800)</label><input type="number" min="200" max="800" id="scoreMath" placeholder="600"></div>
+            <div class="field"><label>R&amp;W (200-800)</label><input type="number" min="200" max="800" id="scoreRW" placeholder="600"></div>
+          </div>
+          <div class="field"><label>Test name / notes</label><input type="text" id="scoreNotes" placeholder="Bluebook Practice Test 4"></div>
+          <button class="btn" onclick="addScore()">Log Score</button>
+        </div>
+        <div class="card">
+          <h2>Score History</h2>
+          <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Total</th><th>Δ</th><th>Math</th><th>R&amp;W</th><th>Notes</th><th></th></tr></thead><tbody id="scoreTable"></tbody></table></div>
+        </div>
       </div>
     </section>
 
@@ -415,7 +431,7 @@
       <div class="field"><label>Due date</label><input type="date" id="hwDue"></div>
       <div class="field"><label>Assign to</label><select id="hwStudent"></select></div>
     </div>
-    <div class="card" style="background:var(--surface-2);margin-bottom:10px">
+    <div class="panel" style="margin-bottom:10px">
       <h3 style="margin-top:0">Attachments (URLs, PDFs, videos, docs)</h3>
       <div id="attachList"></div>
       <div class="two-col">
@@ -427,7 +443,7 @@
         <button class="btn secondary sm" onclick="addAttachment()">+ Add link</button>
         <label class="btn secondary sm" style="cursor:pointer;margin:0">📎 Upload file<input type="file" id="attFile" style="display:none" onchange="uploadAttachment()"></label>
       </div>
-      <p class="muted" style="font-size:11px">Paste any URL (Google Drive, Dropbox, direct PDF, YouTube) — or upload a file (free 1GB storage).</p>
+      <p class="muted" style="font-size:12px">Paste any URL (Google Drive, Dropbox, direct PDF, YouTube) — or upload a file (free 1GB storage).</p>
     </div>
     <button class="btn" onclick="assignHomework()">Assign Homework</button>
     <p id="hwMsg" style="font-size:12px;margin-top:8px"></p>
@@ -479,15 +495,15 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/config.js?v=9"></script>
-<script src="js/state.js?v=9"></script>
-<script src="js/helpers.js?v=9"></script>
-<script src="js/api.js?v=9"></script>
-<script src="js/auth.js?v=9"></script>
-<script src="js/render.js?v=9"></script>
-<script src="js/errorlog.js?v=9"></script>
-<script src="js/sessions.js?v=9"></script>
-<script src="js/admin.js?v=9"></script>
-<script src="js/app.js?v=9"></script>
+<script src="js/config.js?v=11"></script>
+<script src="js/state.js?v=11"></script>
+<script src="js/helpers.js?v=11"></script>
+<script src="js/api.js?v=11"></script>
+<script src="js/auth.js?v=11"></script>
+<script src="js/render.js?v=11"></script>
+<script src="js/errorlog.js?v=11"></script>
+<script src="js/sessions.js?v=11"></script>
+<script src="js/admin.js?v=11"></script>
+<script src="js/app.js?v=11"></script>
 </body>
 </html>

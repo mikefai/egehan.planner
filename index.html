@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Egahan Sahban — SAT Planner & Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --panel: #ffffff;
+    --panel2: #eef1f8;
+    --panel3: #e4e9f3;
+    --accent: #3b5bdb;
+    --accent2: #7c3aed;
+    --good: #0ca678;
+    --warn: #e8950a;
+    --bad: #e03131;
+    --text: #1a1d2e;
+    --muted: #5b6378;
+    --border: #d9dfeb;
+    --shadow: 0 1px 3px rgba(26,29,46,.06), 0 4px 12px rgba(26,29,46,.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+  h1,h2,h3 { font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: -0.02em; }
+  header { background: var(--panel); padding: 20px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: var(--shadow); }
+  header h1 { font-size: 22px; font-weight: 700; }
+  header .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .profile { display: flex; gap: 20px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat .v { font-size: 18px; font-weight: 700; color: var(--accent); font-family: 'Bricolage Grotesque', sans-serif; }
+  .stat .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+  nav { display: flex; gap: 6px; padding: 10px 32px; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; position: sticky; top: 0; z-index: 10; }
+  nav button { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 7px 13px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all .15s; }
+  nav button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  nav button:hover:not(.active) { color: var(--text); border-color: var(--accent); }
+  main { padding: 24px 32px; max-width: 1240px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 16px; margin-bottom: 10px; color: var(--text); font-weight: 700; }
+  .card h3 { font-size: 13px; margin: 14px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+  .big { font-size: 34px; font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; line-height: 1; }
+  .muted { color: var(--muted); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn { background: var(--accent); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity .15s; }
+  .btn:hover { opacity: 0.9; }
+  .btn.secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
+  .btn.danger { background: var(--bad); }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  input, select, textarea { background: var(--panel2); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px; font-size: 13px; width: 100%; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; font-weight: 600; }
+  .field { margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; background: var(--panel2); }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .pill.good { background: rgba(12,166,120,.12); color: var(--good); }
+  .pill.warn { background: rgba(232,149,10,.12); color: var(--warn); }
+  .pill.bad { background: rgba(224,49,49,.12); color: var(--bad); }
+  .pill.info { background: rgba(59,91,219,.12); color: var(--accent); }
+  .pill.gray { background: var(--panel2); color: var(--muted); }
+  .progress { height: 8px; background: var(--panel3); border-radius: 999px; overflow: hidden; }
+  .progress > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .3s; }
+  .list { list-style: none; }
+  .list li { padding: 9px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .list li:last-child { border-bottom: none; }
+  .empty { color: var(--muted); text-align: center; padding: 20px; font-size: 13px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .two-col { grid-template-columns: 1fr; } header { padding: 14px 16px; } main { padding: 14px 16px; } nav { padding: 8px 16px; } .grid { grid-template-columns: 1fr; } }
+  .resource { border: 1px solid var(--border); border-radius: 10px; padding: 13px; margin-bottom: 10px; background: var(--panel2); }
+  .resource .title { font-weight: 600; color: var(--accent); margin-bottom: 3px; font-size: 14px; }
+  .resource .meta { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  .resource .desc { font-size: 13px; }
+  .checkbox { width: 17px; height: 17px; cursor: pointer; accent-color: var(--accent); }
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .kanban { grid-template-columns: 1fr; } }
+  .kanban-col { background: var(--panel2); border-radius: 10px; padding: 12px; min-height: 180px; }
+  .kanban-col h4 { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.6px; font-weight: 700; }
+  .kcard { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 13px; }
+  .kcard .title { font-weight: 600; }
+  .kcard .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .modal-back { position: fixed; inset: 0; background: rgba(26,29,46,.5); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); }
+  .modal-back.show { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: 90%; max-width: 500px; max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+  .modal h2 { margin-bottom: 14px; font-size: 18px; }
+  .close { float: right; cursor: pointer; color: var(--muted); font-size: 22px; line-height: 1; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--good); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; display: none; z-index: 100; box-shadow: var(--shadow); font-weight: 600; }
+  .toast.show { display: block; }
+  .hero { background: linear-gradient(135deg, #eef2ff, #f3e8ff); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+  .hero h2 { color: var(--text); font-size: 20px; }
+  .countdown { font-size: 26px; font-weight: 800; color: var(--warn); font-family: 'Bricolage Grotesque', sans-serif; }
+  .chart { height: 170px; display: flex; align-items: flex-end; gap: 5px; padding: 10px 0 22px; }
+  .bar { flex: 1; background: linear-gradient(180deg, var(--accent), var(--accent2)); border-radius: 4px 4px 0 0; min-height: 4px; position: relative; }
+  .bar span { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--muted); white-space: nowrap; }
+  .bar .val { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--text); font-weight: 600; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-cell { border: 1px solid var(--border); border-radius: 6px; padding: 6px 4px; min-height: 52px; font-size: 11px; background: var(--panel); }
+  .cal-cell .d { font-weight: 700; color: var(--muted); }
+  .cal-cell.has { background: #eef2ff; }
+  .cal-cell .goal { font-size: 10px; color: var(--accent); margin-top: 2px; }
+  .stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .stat-box { flex: 1; min-width: 120px; background: var(--panel2); border-radius: 10px; padding: 12px; text-align: center; }
+  .stat-box .v { font-size: 20px; font-weight: 700; color: var(--accent); font-family: 'Bricolage Grotesque', sans-serif; }
+  .stat-box .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .proj-card { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; background: var(--panel2); }
+  .proj-card .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .proj-card .name { font-weight: 700; font-size: 14px; }
+  .proj-card .meta { font-size: 11px; color: var(--muted); margin: 4px 0; }
+  .proj-card .bar { margin: 8px 0 4px; }
+  .toggle-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .toggle-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Egahan Sahban</h1>
+    <div class="sub">SAT prep · US university admissions · AI &amp; Computer Science</div>
+  </div>
+  <div class="profile">
+    <div class="stat"><div class="v">1200</div><div class="l">Current</div></div>
+    <div class="stat"><div class="v">1450+</div><div class="l">Target</div></div>
+    <div class="stat"><div class="v" id="daysLeft">—</div><div class="l">Days to Test</div></div>
+    <div class="stat"><div class="v">3-4h</div><div class="l">Daily Study</div></div>
+    <div class="stat"><div class="v">5h</div><div class="l">Weekly Portfolio</div></div>
+  </div>
+</header>
+<nav>
+  <button class="active" data-tab="dashboard">Dashboard</button>
+  <button data-tab="assignments">Assignments</button>
+  <button data-tab="studylog">Study Log</button>
+  <button data-tab="scores">SAT Scores</button>
+  <button data-tab="portfolio">Portfolio</button>
+  <button data-tab="schedule">Schedule</button>
+  <button data-tab="resources">Resources</button>
+  <button data-tab="goals">Goals</button>
+</nav>
+<main>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="section active">
+  <div class="hero">
+    <h2>Mission: 1200 → 1450+ in 31 days</h2>
+    <p class="muted" style="font-size:13px;margin-top:4px">Test date December 5, 2026 · Need +250 points · ~8 points per day</p>
+    <div class="countdown" id="countdownText">Loading…</div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <h2>Score Progress</h2>
+      <div class="big" id="currentScore">1200</div>
+      <div class="muted" style="font-size:13px;margin-top:4px">Current score toward 1450+</div>
+      <div class="progress" style="margin-top:12px"><div id="scoreBar" style="width:0%"></div></div>
+      <div class="muted" style="margin-top:6px;font-size:12px" id="scorePct">0% of the way</div>
+    </div>
+    <div class="card">
+      <h2>Today's Study Hours</h2>
+      <div class="big" id="todayHours">0</div>
+      <div class="muted" style="font-size:13px;margin-top:4px">of the 3-4 hour daily promise</div>
+      <div class="progress" style="margin-top:12px"><div id="todayBar" style="width:0%"></div></div>
+      <div class="muted" style="margin-top:6px;font-size:12px" id="todayStatus">—</div>
+    </div>
+    <div class="card">
+      <h2>This Week</h2>
+      <div class="big" id="weekHours">0</div>
+      <div class="muted" style="font-size:13px;margin-top:4px">SAT study hours logged</div>
+      <div class="progress" style="margin-top:12px"><div id="weekBar" style="width:0%"></div></div>
+      <div class="muted" style="margin-top:6px;font-size:12px">Portfolio: <b id="portWeek">0.0</b> / 5.0 h</div>
+    </div>
+    <div class="card">
+      <h2>Assignments</h2>
+      <div class="big" id="assignDone">0</div>
+      <div class="muted" style="font-size:13px;margin-top:4px">completed of <span id="assignTotal">0</span></div>
+      <div class="progress" style="margin-top:12px"><div id="assignBar" style="width:0%"></div></div>
+      <div class="muted" style="margin-top:6px;font-size:12px" id="assignStatus">—</div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <h2>Recent Study Sessions</h2>
+      <ul class="list" id="recentSessions"></ul>
+    </div>
+    <div class="card">
+      <h2>Upcoming Assignments</h2>
+      <ul class="list" id="upcomingAssign"></ul>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Weekly Study Hours (last 7 days)</h2>
+    <div class="chart" id="weekChart"></div>
+  </div>
+</section>
+
+<!-- ASSIGNMENTS -->
+<section id="assignments" class="section">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <h2 style="margin:0">Assignment Planner</h2>
+      <button class="btn" onclick="openAssignModal()">+ Add Assignment</button>
+    </div>
+    <div class="field" style="max-width:240px">
+      <label>Filter by</label>
+      <select id="assignFilter" onchange="renderAssignments()">
+        <option value="all">All assignments</option>
+        <option value="todo">To Do</option>
+        <option value="doing">In Progress</option>
+        <option value="done">Done</option>
+        <option value="sat">SAT Prep</option>
+        <option value="portfolio">Portfolio</option>
+        <option value="school">School</option>
+      </select>
+    </div>
+    <div class="kanban">
+      <div class="kanban-col"><h4>To Do</h4><div id="col-todo"></div></div>
+      <div class="kanban-col"><h4>In Progress</h4><div id="col-doing"></div></div>
+      <div class="kanban-col"><h4>Done</h4><div id="col-done"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STUDY LOG -->
+<section id="studylog" class="section">
+  <div class="card">
+    <h2>Log a Study Session</h2>
+    <p class="muted" style="font-size:12px;margin-bottom:12px">Track multiple sessions per day with start and end times.</p>
+    <div class="two-col">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="logDate">
+      </div>
+      <div class="field">
+        <label>Subject / Focus</label>
+        <select id="logSubject">
+          <option>SAT Math</option>
+          <option>SAT Reading</option>
+          <option>SAT Writing & Language</option>
+          <option>Full Practice Test</option>
+          <option>Practice Section</option>
+          <option>Error Log Review</option>
+          <option>Vocabulary Drills</option>
+          <option>School Homework</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Start time</label>
+        <input type="time" id="logStart">
+      </div>
+      <div class="field">
+        <label>End time</label>
+        <input type="time" id="logEnd">
+      </div>
+    </div>
+    <div class="field">
+      <label>Notes (what you worked on)</label>
+      <input type="text" id="logNotes" placeholder="e.g. Algebra: linear equations, 20 practice questions">
+    </div>
+    <button class="btn" onclick="addSession()">Log Session</button>
+  </div>
+  <div class="card">
+    <h2>Session History</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Date</th><th>Time</th><th>Hours</th><th>Subject</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="sessionTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SAT SCORES -->
+<section id="scores" class="section">
+  <div class="card">
+    <h2>Log a Practice Test Score</h2>
+    <div class="two-col">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="scoreDate">
+      </div>
+      <div class="field">
+        <label>Total Score (400-1600)</label>
+        <input type="number" min="400" max="1600" id="scoreTotal" placeholder="1200">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Math (200-800)</label>
+        <input type="number" min="200" max="800" id="scoreMath" placeholder="600">
+      </div>
+      <div class="field">
+        <label>Reading &amp; Writing (200-800)</label>
+        <input type="number" min="200" max="800" id="scoreRW" placeholder="600">
+      </div>
+    </div>
+    <div class="field">
+      <label>Test name / notes</label>
+      <input type="text" id="scoreNotes" placeholder="e.g. Bluebook Practice Test 4">
+    </div>
+    <button class="btn" onclick="addScore()">Log Score</button>
+  </div>
+  <div class="card">
+    <h2>Score History</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Date</th><th>Total</th><th>Math</th><th>R&amp;W</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="scoreTable"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px">
+      <h3>Score Trend</h3>
+      <div class="chart" id="scoreChart"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" class="section">
+  <div class="card" id="portProjCard">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 style="margin:0">Portfolio &amp; Self-Development Projects</h2>
+      <button class="btn" id="addProjBtn" onclick="openProjModal()">+ Add Project</button>
+    </div>
+    <div id="portLock" style="display:none;margin-bottom:12px"></div>
+    <p class="muted" style="font-size:13px;margin-bottom:12px">Weekly target: 5 hours across projects. Track progress, status, and hours per project.</p>
+    <div class="stat-row" id="portStats"></div>
+    <div id="projList"></div>
+  </div>
+  <div class="card" id="portLogCard">
+    <h2>Log Portfolio Hours</h2>
+    <div id="portStudyStatus" class="muted" style="font-size:12px;margin-bottom:10px"></div>
+    <div class="two-col">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="portDate">
+      </div>
+      <div class="field">
+        <label>Hours</label>
+        <input type="number" step="0.25" min="0" id="portHours">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Project</label>
+        <select id="portProject"></select>
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <input type="text" id="portNotes">
+      </div>
+    </div>
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" class="checkbox" id="portOverride">
+        <span>Daily SAT study not completed (log anyway)</span>
+      </label>
+    </div>
+    <button class="btn" onclick="addPortSession()">Log Hours</button>
+  </div>
+  <div class="card" id="portHistoryCard">
+    <h2>Portfolio Session History</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Date</th><th>Hours</th><th>Project</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="portTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section id="schedule" class="section">
+  <div class="card">
+    <h2>Detailed Weekly Schedule</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:12px">3-4h daily SAT study + 5h/week portfolio. Targets the weak areas needed for +250 points.</p>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Day</th><th>SAT Study (3-4h) — Specific Focus</th><th>Portfolio / Self-Dev</th><th>Checkpoint</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Monday</b></td>
+            <td>Math 1.5h: Heart of Algebra — linear equations &amp; systems (Khan Academy unit) · R&amp;W 1.5h: Standard English Conventions — punctuation &amp; sentence boundaries (Meltzer grammar)</td>
+            <td>0.7h AI project: data pipeline / dataset prep</td>
+            <td>Review weekend error log; set week goals</td>
+          </tr>
+          <tr>
+            <td><b>Tuesday</b></td>
+            <td>Reading 2h: Craft &amp; Structure — words in context + text structure (Critical Reader ch. 3-4) · Math 1.5h: Problem Solving &amp; Data Analysis — ratios, percentages, scatterplots</td>
+            <td>0.7h AI project: model training script</td>
+            <td>Vocabulary: 15 new words with context sentences</td>
+          </tr>
+          <tr>
+            <td><b>Wednesday</b></td>
+            <td>Writing 1.5h: Expression of Ideas — transitions &amp; rhetorical synthesis · Math 1.5h: Advanced Math — quadratics, exponentials, polynomials</td>
+            <td>0.7h Portfolio: polish README + screenshots</td>
+            <td>Mid-week mini quiz (20 mixed questions, timed)</td>
+          </tr>
+          <tr>
+            <td><b>Thursday</b></td>
+            <td>Math 2h: Geometry &amp; Trigonometry — area, volume, right triangles, unit circle · R&amp;W 1.5h: Information &amp; Ideas — central idea &amp; evidence (paired passages)</td>
+            <td>0.7h AI project: evaluation &amp; metrics</td>
+            <td>Review weak topics from Mon-Wed drills</td>
+          </tr>
+          <tr>
+            <td><b>Friday</b></td>
+            <td>Practice 2h: one full R&amp;W module + one Math module (Bluebook) · 1.5h: error-log deep review, categorize by skill</td>
+            <td>0.7h Self-dev: read AI paper / CS article</td>
+            <td>Light day; track accuracy by domain</td>
+          </tr>
+          <tr>
+            <td><b>Saturday</b></td>
+            <td>Full practice test 3h (Bluebook) · 1h: score, log, review top 10 mistakes</td>
+            <td>—</td>
+            <td>Weekly assessment; update score chart</td>
+          </tr>
+          <tr>
+            <td><b>Sunday</b></td>
+            <td>2h: targeted drills on Saturday's weak skills · 1h: timing practice (pace to finish with 2 min spare)</td>
+            <td>2h Portfolio project: feature build + commit</td>
+            <td>Plan next week; set 3 priority goals</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h2>31-Day Milestones (Specific &amp; Elaborate)</h2>
+    <ul class="list">
+      <li><span><b>Week 1 (Nov 4-10): Baseline &amp; Diagnosis.</b> Take Bluebook Test 1 cold (target 1200-1240). Build error log by skill. Identify top 3 weak domains per section. Set up Khan Academy personalized plan. Start AI project repo.</span><span class="pill info">1200 → 1260</span></li>
+      <li><span><b>Week 2 (Nov 11-17): Targeted Skill Building.</b> Drill weak domains daily (20-30 questions). Take Bluebook Tests 2 &amp; 3. Read Meltzer grammar units + Critical Reader ch. 1-4. Math: complete Algebra + Problem Solving units. Portfolio: 2h/week minimum.</span><span class="pill info">1260 → 1320</span></li>
+      <li><span><b>Week 3 (Nov 18-24): Integration &amp; Timing.</b> Bluebook Tests 4 &amp; 5. Focus on pacing (finish sections with time to spare). Error-log mastery: re-attempt every missed question until correct. Advanced Math + Geometry deep dive. Reading: evidence &amp; inference drills.</span><span class="pill info">1320 → 1390</span></li>
+      <li><span><b>Week 4 (Nov 25-Dec 1): Polish &amp; Stamina.</b> Bluebook Test 6 + one Dr. Chung math test. Full-length timed simulations on Sat. Vocabulary consolidation (100+ words). Finalize AI portfolio project v1. Reduce new learning; reinforce.</span><span class="pill info">1390 → 1440+</span></li>
+      <li><span><b>Dec 2-4: Taper &amp; Test Prep.</b> Light review only (error log + vocab). No new content. Sleep 8h, hydrate. Print admission ticket, pack calculator, snacks. Visualize test day.</span><span class="pill good">Ready</span></li>
+      <li><span><b>Dec 5: SAT Test Day.</b> Arrive 30 min early. Trust preparation. Target 1450+.</span><span class="pill warn">Test Day</span></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Day-by-Day Plan (Nov 4 – Dec 5)</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:12px">Scaled to every single day. Each day: SAT focus, portfolio/self-dev, checkpoint.</p>
+    <div style="overflow-x:auto;max-height:520px;overflow-y:auto">
+      <table>
+        <thead><tr><th>Date</th><th>Phase</th><th>SAT Focus (3-4h)</th><th>Portfolio / Self-Dev</th><th>Checkpoint</th></tr></thead>
+        <tbody id="dayPlanTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- DAY BY DAY PLAN (injected via JS into schedule) -->
+<!-- RESOURCES -->
+<section id="resources" class="section">
+  <div class="card">
+    <h2>Study Resources to Reach 1450+</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:16px">Curated and prioritized for a 1200 → 1450+ jump in 31 days.</p>
+    <h3>Official (Free) — Highest Priority</h3>
+    <div class="resource"><div class="title">College Board Bluebook App</div><div class="meta">Official · Free · 6+ practice tests</div><div class="desc">Same format as the real digital SAT. Take at least 6 full tests. The single most important resource.</div></div>
+    <div class="resource"><div class="title">Khan Academy Official SAT Practice</div><div class="meta">Official partner · Free · Personalized</div><div class="desc">Links to your College Board account. Best for targeted skill building and video lessons.</div></div>
+    <div class="resource"><div class="title">College Board Question Bank</div><div class="meta">Official · Free · Topic-filtered</div><div class="desc">Filter by skill/domain to drill weak areas. Use for error-log follow-up.</div></div>
+    <h3>Math (Target: 700+)</h3>
+    <div class="resource"><div class="title">PWN the SAT: Math Guide</div><div class="meta">Book · ~$30 · Strategy</div><div class="desc">Excellent strategy and tricky problems. Great for jumping 600 → 700+.</div></div>
+    <div class="resource"><div class="title">Dr. John Chung's SAT Math</div><div class="meta">Book · Advanced · 10 tests</div><div class="desc">Hardest math practice available. Use in final 2 weeks for stamina and ceiling.</div></div>
+    <div class="resource"><div class="title">Target Test Prep (SAT Math)</div><div class="meta">Online · Paid · Structured</div><div class="desc">Comprehensive math course with analytics. Good if fundamentals are shaky.</div></div>
+    <h3>Reading &amp; Writing (Target: 700+)</h3>
+    <div class="resource"><div class="title">Erica Meltzer — The Critical Reader</div><div class="meta">Book · Reading strategy</div><div class="desc">Gold standard for SAT reading. Teaches evidence-based reasoning and passage strategy.</div></div>
+    <div class="resource"><div class="title">Erica Meltzer — The Ultimate Guide to SAT Grammar</div><div class="meta">Book · Grammar rules</div><div class="desc">Covers every grammar rule tested. Pair with practice questions.</div></div>
+    <div class="resource"><div class="title">1600.io</div><div class="meta">Online · Video explanations</div><div class="desc">Detailed video walkthroughs of official practice tests. Invaluable for understanding mistakes.</div></div>
+    <h3>Question Banks &amp; Drills</h3>
+    <div class="resource"><div class="title">UWorld SAT</div><div class="meta">Online · Paid · High quality</div><div class="desc">Excellent explanations and analytics. Great for daily drills.</div></div>
+    <div class="resource"><div class="title">SAT Black Book</div><div class="meta">Book · Strategy</div><div class="desc">Teaches how to exploit the test's design. Mindset + strategy focus.</div></div>
+    <h3>AI / CS Portfolio &amp; Self-Development (5h/week)</h3>
+    <div class="resource"><div class="title">fast.ai — Practical Deep Learning</div><div class="meta">Free course · AI</div><div class="desc">Hands-on deep learning. Build projects for your portfolio.</div></div>
+    <div class="resource"><div class="title">CS50 (Harvard)</div><div class="meta">Free · edX · CS fundamentals</div><div class="desc">Strong CS foundation. Great for portfolio projects.</div></div>
+    <div class="resource"><div class="title">Kaggle Learn</div><div class="meta">Free · Micro-courses</div><div class="desc">Python, ML, data viz. Quick wins for skill building.</div></div>
+    <div class="resource"><div class="title">GitHub + Personal Website</div><div class="meta">Free · Portfolio hosting</div><div class="desc">Showcase projects. Essential for US university applications.</div></div>
+    <div class="resource"><div class="title">LeetCode / Codeforces</div><div class="meta">Free · Algorithm practice</div><div class="desc">Build problem-solving skills for CS programs.</div></div>
+  </div>
+</section>
+
+<!-- GOALS -->
+<section id="goals" class="section">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 style="margin:0">Goals &amp; Milestones</h2>
+      <div class="toggle-row" style="margin:0">
+        <button class="toggle-btn active" id="goalListBtn" onclick="setGoalView('list')">List</button>
+        <button class="toggle-btn" id="goalCalBtn" onclick="setGoalView('calendar')">Calendar</button>
+      </div>
+    </div>
+    <div id="goalsList"></div>
+    <div id="goalsCalendar" style="display:none"></div>
+    <button class="btn" style="margin-top:12px" onclick="openGoalModal()">+ Add Goal with Target Date</button>
+  </div>
+</section>
+
+</main>
+
+<!-- Modals -->
+<div class="modal-back" id="assignModal">
+  <div class="modal">
+    <span class="close" onclick="closeModal('assignModal')">&times;</span>
+    <h2>Add Assignment</h2>
+    <div class="field"><label>Title</label><input id="aTitle"></div>
+    <div class="two-col">
+      <div class="field"><label>Category</label><select id="aCat"><option value="sat">SAT Prep</option><option value="portfolio">Portfolio</option><option value="school">School</option><option value="other">Other</option></select></div>
+      <div class="field"><label>Priority</label><select id="aPrio"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Due date</label><input type="date" id="aDue"></div>
+      <div class="field"><label>Status</label><select id="aStatus"><option value="todo">To Do</option><option value="doing">In Progress</option><option value="done">Done</option></select></div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="aNotes" rows="3"></textarea></div>
+    <button class="btn" onclick="saveAssignment()">Save</button>
+  </div>
+</div>
+
+<div class="modal-back" id="projModal">
+  <div class="modal">
+    <span class="close" onclick="closeModal('projModal')">&times;</span>
+    <h2>Add Project</h2>
+    <div class="field"><label>Name</label><input id="pName"></div>
+    <div class="two-col">
+      <div class="field"><label>Category</label><select id="pCat"><option>AI / ML</option><option>Web Dev</option><option>CS Fundamentals</option><option>Data Science</option><option>Other</option></select></div>
+      <div class="field"><label>Status</label><select id="pStatus"><option>Planning</option><option>In Progress</option><option>Completed</option></select></div>
+    </div>
+    <div class="field"><label>Target hours (weekly contribution)</label><input type="number" step="0.25" min="0" id="pTarget" placeholder="1.0"></div>
+    <div class="field"><label>Description</label><textarea id="pDesc" rows="3"></textarea></div>
+    <button class="btn" onclick="saveProject()">Save</button>
+  </div>
+</div>
+
+<div class="modal-back" id="goalModal">
+  <div class="modal">
+    <span class="close" onclick="closeModal('goalModal')">&times;</span>
+    <h2>Add Goal</h2>
+    <div class="field"><label>Goal</label><input id="gText" placeholder="e.g. Score 1300+ on a practice test"></div>
+    <div class="field"><label>Target date</label><input type="date" id="gDate"></div>
+    <div class="field"><label>Priority</label><select id="gPrio"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select></div>
+    <button class="btn" onclick="saveGoal()">Save</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TEST_DATE = new Date('2026-12-05');
+const START_SCORE = 1200;
+const TARGET_SCORE = 1450;
+
+const S = {
+  get: (k, d=[]) => { try { const v = JSON.parse(localStorage.getItem(k)); if (Array.isArray(d) && !Array.isArray(v)) return d; return v ?? d; } catch { return d; } },
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+let assignments = S.get('assignments', []);
+let sessions = S.get('sessions', []);
+let scores = S.get('scores', []);
+let projects = S.get('projects', []);
+let portSessions = S.get('portSessions', []);
+let goals = S.get('goals', [
+  { text: 'Reach 1300 on a practice test', done: false, due: '2026-11-14', prio: 'high' },
+  { text: 'Complete 6 full Bluebook practice tests', done: false, due: '2026-12-01', prio: 'high' },
+  { text: 'Finish 1 AI portfolio project (v1)', done: false, due: '2026-11-30', prio: 'med' },
+  { text: 'Log 100+ SAT study hours', done: false, due: '2026-12-04', prio: 'med' },
+]);
+
+// Tabs
+document.querySelectorAll('nav button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(b.dataset.tab).classList.add('active');
+    renderAll();
+  });
+});
+
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function openAssignModal(){ document.getElementById('assignModal').classList.add('show'); }
+function openProjModal(){ document.getElementById('projModal').classList.add('show'); }
+function openGoalModal(){ document.getElementById('goalModal').classList.add('show'); }
+
+function escape(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function weekStart(){ const d=new Date(); d.setDate(d.getDate()-d.getDay()); return d.toISOString().slice(0,10); }
+
+function hoursBetween(start,end){
+  if(!start||!end) return 0;
+  const [sh,sm]=start.split(':').map(Number);
+  const [eh,em]=end.split(':').map(Number);
+  let mins = (eh*60+em) - (sh*60+sm);
+  if(mins<0) mins += 24*60;
+  return Math.round(mins/60*100)/100;
+}
+
+// ---------- Assignments ----------
+function saveAssignment(){
+  const a = {
+    id: Date.now(),
+    title: document.getElementById('aTitle').value.trim(),
+    cat: document.getElementById('aCat').value,
+    prio: document.getElementById('aPrio').value,
+    due: document.getElementById('aDue').value,
+    status: document.getElementById('aStatus').value,
+    notes: document.getElementById('aNotes').value.trim(),
+  };
+  if(!a.title){ toast('Title required'); return; }
+  assignments.push(a);
+  S.set('assignments', assignments);
+  closeModal('assignModal');
+  ['aTitle','aDue','aNotes'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+  toast('Assignment added');
+}
+function moveAssign(id, status){
+  const a = assignments.find(x=>x.id===id);
+  if(a){ a.status=status; S.set('assignments',assignments); renderAll(); }
+}
+function delAssign(id){
+  assignments = assignments.filter(x=>x.id!==id);
+  S.set('assignments',assignments); renderAll();
+}
+function renderAssignments(){
+  const filter = document.getElementById('assignFilter').value;
+  ['todo','doing','done'].forEach(col=>{
+    const el = document.getElementById('col-'+col);
+    let items = assignments.filter(a=>a.status===col);
+    if(filter!=='all'){
+      if(['todo','doing','done'].includes(filter)) items = items.filter(a=>a.status===filter);
+      else items = items.filter(a=>a.cat===filter);
+    }
+    if(items.length===0){ el.innerHTML='<div class="empty">Empty</div>'; return; }
+    el.innerHTML = items.map(a=>`
+      <div class="kcard">
+        <div class="title">${escape(a.title)}</div>
+        <div class="meta">${a.cat} · ${a.prio} priority${a.due?' · due '+a.due:''}</div>
+        ${a.notes?`<div class="meta">${escape(a.notes)}</div>`:''}
+        <div class="row" style="margin-top:6px;gap:4px">
+          ${a.status!=='todo'?'<button class="btn secondary" style="padding:2px 8px;font-size:11px" onclick="moveAssign('+a.id+',\'todo\')">← To Do</button>':''}
+          ${a.status!=='doing'?'<button class="btn secondary" style="padding:2px 8px;font-size:11px" onclick="moveAssign('+a.id+',\'doing\')">Doing</button>':''}
+          ${a.status!=='done'?'<button class="btn secondary" style="padding:2px 8px;font-size:11px" onclick="moveAssign('+a.id+',\'done\')">Done ✓</button>':''}
+          <button class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delAssign('+a.id+')">✕</button>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+// ---------- Study log ----------
+function addSession(){
+  const start = document.getElementById('logStart').value;
+  const end = document.getElementById('logEnd').value;
+  const hours = hoursBetween(start,end);
+  const s = {
+    id: Date.now(),
+    date: document.getElementById('logDate').value || todayStr(),
+    start, end,
+    hours: hours>0 ? hours : 0,
+    subject: document.getElementById('logSubject').value,
+    notes: document.getElementById('logNotes').value.trim(),
+  };
+  if(s.hours<=0){ toast('Enter valid start/end times'); return; }
+  sessions.push(s);
+  S.set('sessions', sessions);
+  document.getElementById('logStart').value='';
+  document.getElementById('logEnd').value='';
+  document.getElementById('logNotes').value='';
+  renderAll();
+  toast('Session logged: '+s.hours+'h');
+}
+function delSession(id){
+  sessions = sessions.filter(x=>x.id!==id);
+  S.set('sessions',sessions); renderAll();
+}
+function renderSessions(){
+  const tb = document.getElementById('sessionTable');
+  const sorted = [...sessions].sort((a,b)=>(b.date||'').localeCompare(a.date||'') || (b.start||'').localeCompare(a.start||''));
+  if(sorted.length===0){ tb.innerHTML='<tr><td colspan="6" class="empty">No sessions yet</td></tr>'; return; }
+  tb.innerHTML = sorted.map(s=>`<tr>
+    <td>${s.date}</td>
+    <td>${s.start||'—'}–${s.end||'—'}</td>
+    <td>${s.hours}</td>
+    <td>${escape(s.subject)}</td>
+    <td>${escape(s.notes)}</td>
+    <td><button class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delSession(${s.id})">✕</button></td>
+  </tr>`).join('');
+}
+
+// ---------- Scores ----------
+function addScore(){
+  const sc = {
+    id: Date.now(),
+    date: document.getElementById('scoreDate').value || todayStr(),
+    total: parseInt(document.getElementById('scoreTotal').value) || 0,
+    math: parseInt(document.getElementById('scoreMath').value) || 0,
+    rw: parseInt(document.getElementById('scoreRW').value) || 0,
+    notes: document.getElementById('scoreNotes').value.trim(),
+  };
+  if(sc.total<400){ toast('Enter total score'); return; }
+  scores.push(sc);
+  S.set('scores', scores);
+  ['scoreTotal','scoreMath','scoreRW','scoreNotes'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+  toast('Score logged');
+}
+function delScore(id){
+  scores = scores.filter(x=>x.id!==id);
+  S.set('scores',scores); renderAll();
+}
+function renderScores(){
+  const tb = document.getElementById('scoreTable');
+  const sorted = [...scores].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(sorted.length===0){ tb.innerHTML='<tr><td colspan="6" class="empty">No scores yet</td></tr>'; return; }
+  tb.innerHTML = sorted.map(s=>`<tr>
+    <td>${s.date}</td><td><b>${s.total}</b></td><td>${s.math}</td><td>${s.rw}</td><td>${escape(s.notes)}</td>
+    <td><button class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delScore(${s.id})">✕</button></td>
+  </tr>`).join('');
+  const asc = [...scores].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const chart = document.getElementById('scoreChart');
+  if(asc.length===0){ chart.innerHTML=''; return; }
+  const min = Math.min(...asc.map(s=>s.total), 1000);
+  const max = Math.max(...asc.map(s=>s.total), 1450);
+  const range = max-min || 1;
+  chart.innerHTML = asc.map(s=>{
+    const h = ((s.total-min)/range)*150 + 10;
+    return `<div class="bar" style="height:${h}px"><span class="val">${s.total}</span><span>${s.date.slice(5)}</span></div>`;
+  }).join('');
+}
+
+// ---------- Portfolio ----------
+function saveProject(){
+  const p = {
+    id: Date.now(),
+    name: document.getElementById('pName').value.trim(),
+    cat: document.getElementById('pCat').value,
+    status: document.getElementById('pStatus').value,
+    target: parseFloat(document.getElementById('pTarget').value) || 0,
+    desc: document.getElementById('pDesc').value.trim(),
+    progress: 0,
+  };
+  if(!p.name){ toast('Name required'); return; }
+  projects.push(p);
+  S.set('projects', projects);
+  closeModal('projModal');
+  ['pName','pDesc','pTarget'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+  toast('Project added');
+}
+function delProject(id){
+  projects = projects.filter(x=>x.id!==id);
+  S.set('projects',projects); renderAll();
+}
+function setProjStatus(id,status){
+  const p = projects.find(x=>x.id===id);
+  if(p){ p.status=status; S.set('projects',projects); renderAll(); }
+}
+function setProjProgress(id,val){
+  const p = projects.find(x=>x.id===id);
+  if(p){ p.progress=Math.max(0,Math.min(100,val)); S.set('projects',projects); renderPortfolio(); }
+}
+function addPortSession(){
+  const todayStudy = sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+s.hours,0);
+  const override = document.getElementById('portOverride').checked;
+  if(todayStudy < 3 && !override) {
+    // allowed
+  } else if (todayStudy >= 3 && !override) {
+    toast('Daily SAT study complete (≥3h). Check override to log portfolio hours.');
+    return;
+  }
+  const ps = {
+    id: Date.now(),
+    date: document.getElementById('portDate').value || todayStr(),
+    hours: parseFloat(document.getElementById('portHours').value) || 0,
+    project: document.getElementById('portProject').value,
+    notes: document.getElementById('portNotes').value.trim(),
+  };
+  if(ps.hours<=0){ toast('Enter hours'); return; }
+  portSessions.push(ps);
+  S.set('portSessions', portSessions);
+  document.getElementById('portHours').value='';
+  document.getElementById('portNotes').value='';
+  document.getElementById('portOverride').checked=false;
+  renderAll();
+  toast('Portfolio hours logged');
+}
+function delPort(id){
+  portSessions = portSessions.filter(x=>x.id!==id);
+  S.set('portSessions',portSessions); renderAll();
+}
+function renderPortfolio(){
+  const todayStudy = sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+s.hours,0);
+  const unlocked = todayStudy >= 3;
+  const addBtn = document.getElementById('addProjBtn');
+  const lockEl = document.getElementById('portLock');
+  const logCard = document.getElementById('portLogCard');
+  if(addBtn) addBtn.style.display = unlocked ? '' : 'none';
+  if(logCard) logCard.style.display = unlocked ? '' : 'none';
+  const projCard = document.getElementById('portProjCard');
+  const histCard = document.getElementById('portHistoryCard');
+  if(projCard) projCard.style.display = unlocked ? '' : 'none';
+  if(histCard) histCard.style.display = unlocked ? '' : 'none';
+  if(lockEl){
+    if(unlocked){
+      lockEl.style.display='none';
+      lockEl.innerHTML='';
+    } else {
+      lockEl.style.display='block';
+      lockEl.innerHTML = `<div class="card" style="background:#fff3cd;border-color:#ffe08a">
+        <h2 style="color:var(--warn)">🔒 Portfolio locked</h2>
+        <p class="muted" style="font-size:13px">Complete at least 3 hours of SAT study today to unlock portfolio logging and project management. Current: <b>${todayStudy.toFixed(1)}h / 3h</b> (${(3-todayStudy).toFixed(1)}h remaining).</p>
+      </div>`;
+    }
+  }
+  // stats
+  const ws = weekStart();
+  const weekPort = portSessions.filter(s=>s.date>=ws).reduce((a,s)=>a+s.hours,0);
+  const totalPort = portSessions.reduce((a,s)=>a+s.hours,0);
+  document.getElementById('portStats').innerHTML = `
+    <div class="stat-box"><div class="v">${projects.length}</div><div class="l">Projects</div></div>
+    <div class="stat-box"><div class="v">${weekPort.toFixed(1)}</div><div class="l">This week (h)</div></div>
+    <div class="stat-box"><div class="v">${totalPort.toFixed(1)}</div><div class="l">Total hours</div></div>
+    <div class="stat-box"><div class="v">${Math.max(0,5-weekPort).toFixed(1)}</div><div class="l">Remaining (h)</div></div>
+  `;
+  // study status
+  const statusEl = document.getElementById('portStudyStatus');
+  if(todayStudy >= 3){
+    statusEl.innerHTML = `<span class="pill good">Daily SAT study complete: ${todayStudy.toFixed(1)}h / 3h</span> — portfolio hours are extra. Check override to log.`;
+  } else {
+    statusEl.innerHTML = `<span class="pill warn">Daily SAT study: ${todayStudy.toFixed(1)}h / 3h</span> — portfolio hours allowed.`;
+  }
+  // projects
+  const list = document.getElementById('projList');
+  if(projects.length===0){ list.innerHTML='<div class="empty">No projects yet. Add one to start tracking.</div>'; }
+  else {
+    list.innerHTML = projects.map(p=>{
+      const projHours = portSessions.filter(s=>s.project===p.name).reduce((a,s)=>a+s.hours,0);
+      return `
+      <div class="proj-card">
+        <div class="head">
+          <div>
+            <div class="name">${escape(p.name)} <span class="pill info">${p.cat}</span></div>
+            <div class="meta">${escape(p.desc||'No description')} · Target ${p.target||0}h/week</div>
+          </div>
+          <div class="row" style="gap:4px">
+            <select onchange="setProjStatus(${p.id},this.value)" style="width:auto;padding:4px 6px;font-size:11px">
+              ${['Planning','In Progress','Completed'].map(st=>`<option ${p.status===st?'selected':''}>${st}</option>`).join('')}
+            </select>
+            <button class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delProject(${p.id})">✕</button>
+          </div>
+        </div>
+        <div class="meta">Hours logged: <b>${projHours.toFixed(1)}h</b> · Status: <b>${p.status}</b></div>
+        <div class="row" style="gap:8px;margin-top:6px">
+          <label style="margin:0;white-space:nowrap">Progress %</label>
+          <input type="number" min="0" max="100" value="${p.progress||0}" style="width:70px" onchange="setProjProgress(${p.id},parseInt(this.value)||0)">
+          <div class="progress" style="flex:1"><div style="width:${p.progress||0}%"></div></div>
+          <span style="font-size:12px;font-weight:600">${p.progress||0}%</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  // select
+  const sel = document.getElementById('portProject');
+  sel.innerHTML = projects.length ? projects.map(p=>`<option>${escape(p.name)}</option>`).join('') : '<option>No projects</option>';
+  // table
+  const tb = document.getElementById('portTable');
+  const sorted = [...portSessions].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(sorted.length===0){ tb.innerHTML='<tr><td colspan="5" class="empty">No sessions</td></tr>'; return; }
+  tb.innerHTML = sorted.map(s=>`<tr>
+    <td>${s.date}</td><td>${s.hours}</td><td>${escape(s.project)}</td><td>${escape(s.notes)}</td>
+    <td><button class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delPort(${s.id})">✕</button></td>
+  </tr>`).join('');
+}
+
+// ---------- Goals ----------
+let goalView = 'list';
+function setGoalView(v){
+  goalView = v;
+  document.getElementById('goalListBtn').classList.toggle('active', v==='list');
+  document.getElementById('goalCalBtn').classList.toggle('active', v==='calendar');
+  renderGoals();
+}
+function saveGoal(){
+  const g = {
+    id: Date.now(),
+    text: document.getElementById('gText').value.trim(),
+    due: document.getElementById('gDate').value,
+    prio: document.getElementById('gPrio').value,
+    done: false,
+  };
+  if(!g.text){ toast('Goal required'); return; }
+  goals.push(g);
+  S.set('goals', goals);
+  closeModal('goalModal');
+  document.getElementById('gText').value='';
+  document.getElementById('gDate').value='';
+  renderAll();
+  toast('Goal added');
+}
+function toggleGoal(i){ goals[i].done=!goals[i].done; S.set('goals',goals); renderGoals(); }
+function delGoal(i){ goals.splice(i,1); S.set('goals',goals); renderAll(); }
+function renderGoals(){
+  const listEl = document.getElementById('goalsList');
+  const calEl = document.getElementById('goalsCalendar');
+  if(goalView==='list'){
+    listEl.style.display='block'; calEl.style.display='none';
+    const sorted = [...goals].sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+    if(sorted.length===0){ listEl.innerHTML='<div class="empty">No goals yet</div>'; return; }
+    listEl.innerHTML = sorted.map((g,i)=>{
+      const realIdx = goals.indexOf(g);
+      const overdue = g.due && !g.done && g.due < todayStr();
+      return `<div class="list"><li>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1">
+          <input type="checkbox" class="checkbox" ${g.done?'checked':''} onchange="toggleGoal(${realIdx})">
+          <span style="${g.done?'text-decoration:line-through;color:var(--muted)':''}">${escape(g.text)}</span>
+        </label>
+        <div class="row" style="gap:6px">
+          ${g.due?`<span class="pill ${overdue?'bad':g.done?'good':'info'}">${g.due}</span>`:'<span class="pill gray">no date</span>'}
+          <span class="pill ${g.prio==='high'?'bad':g.prio==='med'?'warn':'good'}">${g.prio}</span>
+          <button class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delGoal(${realIdx})">✕</button>
+        </div>
+      </li></div>`;
+    }).join('');
+  } else {
+    listEl.style.display='none'; calEl.style.display='block';
+    // build calendar for current month
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth();
+    const first = new Date(y,m,1);
+    const last = new Date(y,m+1,0);
+    const startDay = first.getDay();
+    const daysInMonth = last.getDate();
+    const monthName = first.toLocaleString('default',{month:'long',year:'numeric'});
+    let html = `<h3 style="text-transform:none;letter-spacing:0;color:var(--text);font-size:15px;margin-bottom:10px">${monthName}</h3><div class="cal-grid">`;
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{ html += `<div style="text-align:center;font-size:10px;color:var(--muted);font-weight:700;padding:4px">${d}</div>`; });
+    for(let i=0;i<startDay;i++) html += `<div class="cal-cell"></div>`;
+    for(let d=1;d<=daysInMonth;d++){
+      const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dayGoals = goals.filter(g=>g.due===ds);
+      const has = dayGoals.length>0;
+      html += `<div class="cal-cell ${has?'has':''}"><div class="d">${d}</div>${dayGoals.map(g=>`<div class="goal">${escape(g.text.slice(0,24))}</div>`).join('')}</div>`;
+    }
+    html += `</div>`;
+    calEl.innerHTML = html;
+  }
+}
+
+function renderDashboard(){
+  const now = new Date();
+  const diff = Math.ceil((TEST_DATE - now)/(1000*60*60*24));
+  document.getElementById('daysLeft').textContent = diff>0?diff:0;
+  document.getElementById('countdownText').textContent = diff>0 ? `${diff} days until test day` : 'Test day!';
+  const latest = scores.length ? [...scores].sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0].total : START_SCORE;
+  document.getElementById('currentScore').textContent = latest;
+  const pct = Math.min(100, Math.max(0, (latest-START_SCORE)/(TARGET_SCORE-START_SCORE)*100));
+  document.getElementById('scoreBar').style.width = pct+'%';
+  document.getElementById('scorePct').textContent = Math.round(pct)+'% of the way to 1450';
+  const today = todayStr();
+  const todayH = sessions.filter(s=>s.date===today).reduce((a,s)=>a+s.hours,0);
+  document.getElementById('todayHours').textContent = todayH.toFixed(2).replace(/\.00$/,'');
+  document.getElementById('todayBar').style.width = Math.min(100, todayH/4*100)+'%';
+  document.getElementById('todayStatus').textContent = todayH>=3 ? 'Daily promise met ✓' : `${(3-todayH).toFixed(1)}h remaining to promise`;
+  const ws = weekStart();
+  const weekH = sessions.filter(s=>s.date>=ws).reduce((a,s)=>a+s.hours,0);
+  document.getElementById('weekHours').textContent = weekH.toFixed(1);
+  document.getElementById('weekBar').style.width = Math.min(100, weekH/25*100)+'%';
+  const portWeek = portSessions.filter(s=>s.date>=ws).reduce((a,s)=>a+s.hours,0);
+  document.getElementById('portWeek').textContent = portWeek.toFixed(1);
+  const total = assignments.length;
+  const done = assignments.filter(a=>a.status==='done').length;
+  document.getElementById('assignTotal').textContent = total;
+  document.getElementById('assignDone').textContent = done;
+  document.getElementById('assignBar').style.width = (total?done/total*100:0)+'%';
+  document.getElementById('assignStatus').textContent = total ? `${done} of ${total} complete` : 'No assignments yet';
+  const recent = document.getElementById('recentSessions');
+  const rs = [...sessions].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5);
+  recent.innerHTML = rs.length ? rs.map(s=>`<li><span>${s.date} · ${escape(s.subject)}${s.start?' ('+s.start+'–'+s.end+')':''}</span><span class="pill info">${s.hours}h</span></li>`).join('') : '<li class="empty">No sessions yet</li>';
+  const up = document.getElementById('upcomingAssign');
+  const ua = assignments.filter(a=>a.status!=='done').sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,5);
+  up.innerHTML = ua.length ? ua.map(a=>`<li><span>${escape(a.title)}</span><span class="pill ${a.prio==='high'?'bad':a.prio==='med'?'warn':'good'}">${a.due||'no due'}</span></li>`).join('') : '<li class="empty">No pending assignments</li>';
+  const chart = document.getElementById('weekChart');
+  const days = [];
+  for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); days.push(d.toISOString().slice(0,10)); }
+  const maxH = Math.max(1, ...days.map(d=>sessions.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0)));
+  chart.innerHTML = days.map(d=>{
+    const h = sessions.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0);
+    const height = (h/maxH)*150;
+    const label = d.slice(5);
+    return `<div class="bar" style="height:${Math.max(4,height)}px"><span class="val">${h?h.toFixed(1):''}</span><span>${label}</span></div>`;
+  }).join('');
+}
+
+const DAY_PLAN = [
+ {d:'2026-11-04',ph:'P1 Baseline',sat:'Diagnostic: Bluebook Test 1 (full, timed). Log score. Start error log by skill.',port:'0.5h: create AI project repo + README',chk:'Baseline score recorded'},
+ {d:'2026-11-05',ph:'P1 Baseline',sat:'Error review Test 1. Math: Heart of Algebra (linear eq). R&W: punctuation & sentence boundaries.',port:'0.5h: dataset search',chk:'Top 3 weak domains identified'},
+ {d:'2026-11-06',ph:'P1 Baseline',sat:'Math: Problem Solving & Data Analysis (ratios, %). Reading: Craft & Structure words in context.',port:'0.7h: data pipeline',chk:'Khan Academy plan set'},
+ {d:'2026-11-07',ph:'P1 Baseline',sat:'Bluebook Test 2 (full). Log & review top 10 mistakes.',port:'—',chk:'Score trend started'},
+ {d:'2026-11-08',ph:'P1 Baseline',sat:'Targeted drills on weak skills (25 Q). Vocab 15 words.',port:'0.7h: model skeleton',chk:'Weak-skill drill done'},
+ {d:'2026-11-09',ph:'P1 Baseline',sat:'Math: Advanced Math (quadratics). R&W: Standard English Conventions.',port:'0.7h: training script',chk:'Algebra unit progress'},
+ {d:'2026-11-10',ph:'P1 Baseline',sat:'Reading: Evidence & Inference. Math: geometry basics. Error log review.',port:'0.7h: eval metrics',chk:'Week 1 complete'},
+ {d:'2026-11-11',ph:'P2 Skills',sat:'Math: quadratics & exponentials deep dive. Writing: Expression of Ideas transitions.',port:'0.7h: feature build',chk:'Advanced math progress'},
+ {d:'2026-11-12',ph:'P2 Skills',sat:'Reading: central idea & evidence (paired). Math: geometry area/volume.',port:'0.7h: portfolio polish',chk:'Reading accuracy up'},
+ {d:'2026-11-13',ph:'P2 Skills',sat:'Bluebook Test 3. Log, review, categorize errors.',port:'—',chk:'Mid-point score check'},
+ {d:'2026-11-14',ph:'P2 Skills',sat:'Drills on weak domains (30 Q). Vocab 15. Grammar units (Meltzer).',port:'0.7h: README + screenshots',chk:'Grammar rules covered'},
+ {d:'2026-11-15',ph:'P2 Skills',sat:'Math: systems of equations. R&W: paired passages.',port:'0.7h: commit & deploy',chk:'Systems mastery'},
+ {d:'2026-11-16',ph:'P2 Skills',sat:'Math: data analysis scatterplots. Reading: words in context.',port:'0.7h: self-dev reading',chk:'Data analysis solid'},
+ {d:'2026-11-17',ph:'P2 Skills',sat:'Bluebook Test 4. Review top mistakes; update error log.',port:'—',chk:'Week 2 complete'},
+ {d:'2026-11-18',ph:'P3 Integrate',sat:'Timing practice: R&W module paced. Math: advanced (polynomials).',port:'0.7h: feature build',chk:'Pacing on track'},
+ {d:'2026-11-19',ph:'P3 Integrate',sat:'Math: geometry & trig (unit circle). Reading: inference drills.',port:'0.7h: code review',chk:'Trig basics done'},
+ {d:'2026-11-20',ph:'P3 Integrate',sat:'Bluebook Test 5. Score, log, review.',port:'—',chk:'Score climbing'},
+ {d:'2026-11-21',ph:'P3 Integrate',sat:'Error-log mastery: re-attempt all missed until correct.',port:'0.7h: portfolio polish',chk:'Error log cleared'},
+ {d:'2026-11-22',ph:'P3 Integrate',sat:'Pacing practice (finish with 2 min spare). Math: problem solving.',port:'0.7h: self-dev reading',chk:'Timing comfortable'},
+ {d:'2026-11-23',ph:'P3 Integrate',sat:'Reading: craft & structure. Writing: transitions & synthesis.',port:'0.7h: feature build',chk:'R&W accuracy up'},
+ {d:'2026-11-24',ph:'P3 Integrate',sat:'Bluebook Test 6. Full review. Update score chart.',port:'—',chk:'Week 3 complete'},
+ {d:'2026-11-25',ph:'P4 Polish',sat:'Dr. Chung math test 1. Vocab consolidation (25 words).',port:'0.7h: finalize v1',chk:'Math ceiling pushed'},
+ {d:'2026-11-26',ph:'P4 Polish',sat:'Full timed simulation (R&W+Math). Error review.',port:'—',chk:'Stamina built'},
+ {d:'2026-11-27',ph:'P4 Polish',sat:'Light drills on weak skills. Portfolio finalize.',port:'2h: polish + deploy',chk:'Portfolio v1 done'},
+ {d:'2026-11-28',ph:'P4 Polish',sat:'Bluebook Test 7 (or repeat weakest). Review.',port:'—',chk:'Consistency check'},
+ {d:'2026-11-29',ph:'P4 Polish',sat:'Timing + stamina. Weak-skill targeted drills.',port:'0.7h: self-dev reading',chk:'Pace locked'},
+ {d:'2026-11-30',ph:'P4 Polish',sat:'Final practice test. Vocab 100+ words review.',port:'0.7h: final commits',chk:'Final score push'},
+ {d:'2026-12-01',ph:'P4 Polish',sat:'Light review: error log + vocab. No new content.',port:'—',chk:'Taper begins'},
+ {d:'2026-12-02',ph:'P5 Taper',sat:'Error log review only (30 min). Vocab flashcards.',port:'0.5h: light reading',chk:'Rest & recover'},
+ {d:'2026-12-03',ph:'P5 Taper',sat:'Light review only. Sleep 8h. Hydrate.',port:'—',chk:'Test prep'},
+ {d:'2026-12-04',ph:'P5 Taper',sat:'Pack calculator, ticket, snacks. Visualize test day. Early sleep.',port:'—',chk:'Ready'},
+ {d:'2026-12-05',ph:'TEST DAY',sat:'SAT Test Day. Arrive 30 min early. Target 1450+.',port:'—',chk:'🎯 Test Day'},
+];
+
+function renderDayPlan(){
+  const tb = document.getElementById('dayPlanTable');
+  if(!tb) return;
+  tb.innerHTML = DAY_PLAN.map(e=>{
+    const isToday = e.d === todayStr();
+    const past = e.d < todayStr();
+    return `<tr style="${isToday?'background:#eef2ff;font-weight:600':''}${past?'opacity:.7':''}">
+      <td>${e.d}<br><span style="font-size:10px;color:var(--muted)">${new Date(e.d).toLocaleDateString('en-US',{weekday:'short'})}</span></td>
+      <td><span class="pill ${e.ph==='TEST DAY'?'warn':e.ph.startsWith('P1')?'gray':e.ph.startsWith('P2')?'info':e.ph.startsWith('P3')?'warn':e.ph.startsWith('P4')?'good':'good'}">${e.ph}</span></td>
+      <td style="font-size:12px">${e.sat}</td>
+      <td style="font-size:12px">${e.port}</td>
+      <td style="font-size:12px">${e.chk}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAll(){
+  renderDashboard();
+  renderAssignments();
+  renderSessions();
+  renderScores();
+  renderPortfolio();
+  renderGoals();
+  renderDayPlan();
+}
+
+document.getElementById('logDate').value = todayStr();
+document.getElementById('scoreDate').value = todayStr();
+document.getElementById('portDate').value = todayStr();
+const gDateEl = document.getElementById('gDate'); if(gDateEl) gDateEl.value = todayStr();
+
+renderAll();
+</script>
+</body>
+</html>

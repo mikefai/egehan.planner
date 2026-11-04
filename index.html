@@ -7,116 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/admin.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  :root {
-    --bg: #f4f6fb; --panel: #ffffff; --panel2: #eef1f8; --panel3: #e4e9f3;
-    --accent: #3b5bdb; --accent2: #7c3aed; --good: #0ca678; --warn: #e8950a;
-    --bad: #e03131; --text: #1a1d2e; --muted: #5b6378; --border: #d9dfeb;
-    --shadow: 0 1px 3px rgba(26,29,46,.06), 0 4px 12px rgba(26,29,46,.04);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
-  h1,h2,h3 { font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: -0.02em; }
-  header { background: var(--panel); padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow); }
-  header h1 { font-size: 20px; font-weight: 700; }
-  header .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
-  .user-chip { display: flex; align-items: center; gap: 10px; }
-  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
-  .role-badge { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-  .role-badge.admin { background: rgba(124,60,237,.12); color: var(--accent2); }
-  .role-badge.student { background: rgba(59,91,219,.12); color: var(--accent); }
-  nav { display: flex; gap: 6px; padding: 10px 24px; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; position: sticky; top: 0; z-index: 10; align-items: center; }
-  nav button { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 7px 13px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all .15s; }
-  nav button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  nav button:hover:not(.active) { color: var(--text); border-color: var(--accent); }
-  .bell { position: relative; margin-left: auto; cursor: pointer; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel2); font-size: 16px; }
-  .bell .badge { position: absolute; top: -4px; right: -4px; background: var(--bad); color: #fff; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 5px; min-width: 16px; text-align: center; }
-  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }
-  .section { display: none; }
-  .section.active { display: block; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-bottom: 16px; }
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
-  .card h2 { font-size: 15px; margin-bottom: 8px; font-weight: 700; }
-  .card h3 { font-size: 12px; margin: 12px 0 4px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
-  .big { font-size: 32px; font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; line-height: 1; }
-  .muted { color: var(--muted); }
-  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .btn { background: var(--accent); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity .15s; }
-  .btn:hover { opacity: .9; }
-  .btn.secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
-  .btn.danger { background: var(--bad); }
-  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-  .btn.sm { padding: 4px 10px; font-size: 12px; }
-  input, select, textarea { background: var(--panel2); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px; font-size: 13px; width: 100%; font-family: inherit; }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
-  label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; font-weight: 600; }
-  .field { margin-bottom: 10px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
-  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: .5px; background: var(--panel2); }
-  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-  .pill.good { background: rgba(12,166,120,.12); color: var(--good); }
-  .pill.warn { background: rgba(232,149,10,.12); color: var(--warn); }
-  .pill.bad { background: rgba(224,49,49,.12); color: var(--bad); }
-  .pill.info { background: rgba(59,91,219,.12); color: var(--accent); }
-  .pill.gray { background: var(--panel2); color: var(--muted); }
-  .pill.purple { background: rgba(124,60,237,.12); color: var(--accent2); }
-  .progress { height: 8px; background: var(--panel3); border-radius: 999px; overflow: hidden; }
-  .progress > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .3s; }
-  .list { list-style: none; }
-  .list li { padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .list li:last-child { border-bottom: none; }
-  .empty { color: var(--muted); text-align: center; padding: 18px; font-size: 13px; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 760px) { .two-col { grid-template-columns: 1fr; } header { padding: 12px 16px; } main { padding: 12px 16px; } nav { padding: 8px 16px; } .grid { grid-template-columns: 1fr; } }
-  .resource { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; background: var(--panel2); }
-  .resource .title { font-weight: 600; color: var(--accent); margin-bottom: 2px; font-size: 14px; }
-  .resource .meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-  .resource .desc { font-size: 13px; }
-  .checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
-  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  @media (max-width: 760px) { .kanban { grid-template-columns: 1fr; } }
-  .kanban-col { background: var(--panel2); border-radius: 10px; padding: 10px; min-height: 160px; }
-  .kanban-col h4 { font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; letter-spacing: .6px; font-weight: 700; }
-  .kcard { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 9px; margin-bottom: 6px; font-size: 13px; }
-  .kcard .title { font-weight: 600; }
-  .kcard .meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .modal-back { position: fixed; inset: 0; background: rgba(26,29,46,.5); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); }
-  .modal-back.show { display: flex; }
-  .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 20px; width: 90%; max-width: 540px; max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
-  .modal h2 { margin-bottom: 12px; font-size: 17px; }
-  .close { float: right; cursor: pointer; color: var(--muted); font-size: 22px; line-height: 1; }
-  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--good); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; display: none; z-index: 100; box-shadow: var(--shadow); font-weight: 600; }
-  .toast.show { display: block; }
-  .hero { background: linear-gradient(135deg, #eef2ff, #f3e8ff); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-  .hero h2 { color: var(--text); font-size: 18px; }
-  .countdown { font-size: 24px; font-weight: 800; color: var(--warn); font-family: 'Bricolage Grotesque', sans-serif; }
-  .chart { height: 160px; display: flex; align-items: flex-end; gap: 4px; padding: 10px 0 20px; }
-  .bar { flex: 1; background: linear-gradient(180deg, var(--accent), var(--accent2)); border-radius: 4px 4px 0 0; min-height: 4px; position: relative; }
-  .bar span { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--muted); white-space: nowrap; }
-  .bar .val { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--text); font-weight: 600; }
-  .notif-panel { position: fixed; top: 60px; right: 16px; width: 340px; max-height: 420px; overflow: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.15); z-index: 60; display: none; }
-  .notif-panel.show { display: block; }
-  .notif-item { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
-  .notif-item:hover { background: var(--panel2); }
-  .notif-item.unread { background: #eef2ff; }
-  .notif-item .t { font-weight: 600; font-size: 13px; }
-  .notif-item .b { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .notif-item .time { font-size: 10px; color: var(--muted); margin-top: 4px; }
-  .attach { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; background: var(--panel2); border: 1px solid var(--border); font-size: 12px; margin: 2px; text-decoration: none; color: var(--accent); }
-  .hw-card { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; background: var(--panel2); }
-  .hw-card .title { font-weight: 700; font-size: 14px; }
-  .hw-card .meta { font-size: 11px; color: var(--muted); margin: 4px 0; }
-  .grade-box { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 8px; }
-  .stat-box { flex: 1; min-width: 110px; background: var(--panel2); border-radius: 10px; padding: 10px; text-align: center; }
-  .stat-box .v { font-size: 18px; font-weight: 700; color: var(--accent); font-family: 'Bricolage Grotesque', sans-serif; }
-  .stat-box .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
-  .auth-screen { max-width: 400px; margin: 60px auto; }
-  .setup-screen { max-width: 640px; margin: 40px auto; }
-  .setup-screen code { background: var(--panel2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-  .hidden { display: none !important; }
-</style>
 </head>
 <body>
 
@@ -132,302 +28,289 @@
     <p class="muted" style="font-size:12px;margin-top:12px;text-align:center">
       <a href="#" onclick="toggleAuthMode();return false" id="authToggle">Need an account? Sign up</a>
     </p>
-    <p id="authErr" style="color:var(--bad);font-size:12px;margin-top:8px"></p>
-  </div>
-</div>
-
-<!-- SETUP SCREEN (shown if Supabase not configured) -->
-<div id="setupScreen" class="setup-screen hidden">
-  <div class="card">
-    <h2>⚙️ Setup required</h2>
-    <p class="muted" style="font-size:13px;margin-bottom:12px">This page needs a free Supabase project to enable sign-in and sync. Follow <code>README.md</code>, then paste your keys below.</p>
-    <div class="field"><label>Supabase Project URL</label><input id="setupUrl" placeholder="https://sdagconjpfzvddxocybp.supabase.co"></div>
-    <div class="field"><label>Supabase anon public key</label><input id="setupKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkYWdjb25qcGZ6dmRkeG9jeWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM4MTQxNjksImV4cCI6MjEwOTM5MDE2OX0.iDKwt-ybtiIttdlMsom236IUNGeGmHxxl3IcNZRrrU4"></div>
-    <button class="btn" onclick="saveSetup()">Save & reload</button>
-    <p class="muted" style="font-size:12px;margin-top:12px">Keys are stored in your browser only. See README.md for full setup.</p>
+    <p id="authErr" style="color:var(--danger);font-size:12px;margin-top:8px"></p>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app" class="hidden">
-<header>
-  <div>
-    <h1>Egahan Sahban — SAT Planner</h1>
-    <div class="sub" id="headerSub">SAT prep · US university admissions · AI &amp; Computer Science</div>
+
+<!-- Sidebar rail -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-name"><span class="brand-mark">📚</span> SAT Planner</div>
+    <div class="brand-sub">Egahan · AI &amp; CS track</div>
   </div>
-  <div class="user-chip">
+  <nav class="nav" id="mainNav">
+    <button class="active" data-tab="dashboard"><span class="ico">🏠</span> Dashboard</button>
+    <button data-tab="assignments"><span class="ico">📋</span> Assignments</button>
+    <button data-tab="studylog"><span class="ico">✏️</span> Study Log</button>
+    <button data-tab="scores"><span class="ico">📈</span> SAT Scores</button>
+    <button data-tab="portfolio"><span class="ico">🤖</span> Portfolio</button>
+    <div class="nav-sep"></div>
+    <button data-tab="schedule"><span class="ico">🗓️</span> Schedule</button>
+    <button data-tab="resources"><span class="ico">📚</span> Resources</button>
+    <button data-tab="goals"><span class="ico">🎯</span> Goals</button>
+    <button data-tab="admin" id="adminTab" class="hidden"><span class="ico">🛠️</span> Admin Console</button>
+  </nav>
+  <div class="sidebar-foot">
     <div class="avatar" id="userAvatar">?</div>
-    <div>
-      <div style="font-size:13px;font-weight:600" id="userName">User</div>
+    <div class="user-meta">
+      <div class="u-name" id="userName">User</div>
       <span class="role-badge" id="userRole">student</span>
     </div>
+  </div>
+</aside>
+
+<!-- Content -->
+<div class="content">
+  <div class="topbar">
+    <div>
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="sub">SAT prep · US university admissions · AI &amp; Computer Science</div>
+    </div>
+    <div class="spacer"></div>
     <div class="bell" onclick="toggleNotifPanel()">🔔<span class="badge hidden" id="notifBadge">0</span></div>
     <button class="btn secondary sm" onclick="doLogout()">Logout</button>
   </div>
-</header>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+      <div class="hero">
+        <h2>Mission: 1200 → 1450+ before test day</h2>
+        <p class="muted" style="font-size:13px;margin-top:4px" id="missionSub">Test date December 5, 2026 · Need +250 points</p>
+        <div class="countdown" id="countdownText">Loading…</div>
+      </div>
+      <div class="grid">
+        <div class="card"><h2>Score Progress</h2><div class="big" id="currentScore">1200</div><div class="muted" style="font-size:13px;margin-top:4px">Current score toward target</div><div class="progress" style="margin-top:12px"><div id="scoreBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px" id="scorePct">0% of the way</div></div>
+        <div class="card"><h2>Today's Study Hours</h2><div class="big" id="todayHours">0</div><div class="muted" style="font-size:13px;margin-top:4px">of the daily promise</div><div class="progress" style="margin-top:12px"><div id="todayBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px" id="todayStatus">—</div></div>
+        <div class="card"><h2>This Week</h2><div class="big" id="weekHours">0</div><div class="muted" style="font-size:13px;margin-top:4px">SAT study hours logged</div><div class="progress" style="margin-top:12px"><div id="weekBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px">Portfolio: <b id="portWeek">0.0</b> / 5.0 h</div></div>
+        <div class="card"><h2>Assignments</h2><div class="big" id="assignDone">0</div><div class="muted" style="font-size:13px;margin-top:4px">completed of <span id="assignTotal">0</span></div><div class="progress" style="margin-top:12px"><div id="assignBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px" id="assignStatus">—</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card"><h2>Recent Study Sessions</h2><ul class="list" id="recentSessions"></ul></div>
+        <div class="card"><h2>Upcoming Homework</h2><ul class="list" id="upcomingAssign"></ul></div>
+      </div>
+      <div class="card"><h2>Weekly Study Hours (last 7 days)</h2><div class="chart" id="weekChart"></div></div>
+    </section>
+
+    <!-- ASSIGNMENTS -->
+    <section id="assignments" class="section">
+      <div class="page-head"><h2>Assignments</h2><p class="desc">Homework from your teacher and your own personal tasks, organized on a board.</p></div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <div class="field" style="max-width:240px;margin:0"><label>Filter by</label>
+            <select id="assignFilter" onchange="renderAssignments()">
+              <option value="all">All</option><option value="todo">To Do</option><option value="doing">In Progress</option>
+              <option value="done">Done</option><option value="homework">Homework</option><option value="sat">SAT Prep</option>
+              <option value="portfolio">Portfolio</option><option value="school">School</option>
+            </select></div>
+          <div class="row" style="gap:6px">
+            <button class="btn secondary sm" onclick="openAssignModal()">+ Personal Task</button>
+            <button class="btn sm" id="assignHwBtn" onclick="openAssignHwModal()" style="display:none">+ Assign Homework</button>
+          </div>
+        </div>
+        <div class="kanban">
+          <div class="kanban-col"><h4>To Do</h4><div id="col-todo"></div></div>
+          <div class="kanban-col"><h4>In Progress</h4><div id="col-doing"></div></div>
+          <div class="kanban-col"><h4>Done</h4><div id="col-done"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDY LOG -->
+    <section id="studylog" class="section">
+      <div class="page-head"><h2>Study Log</h2><p class="desc">Track multiple sessions per day with start and end times.</p></div>
+      <div class="card">
+        <h2>Log a Study Session</h2>
+        <div class="two-col">
+          <div class="field"><label>Date</label><input type="date" id="logDate"></div>
+          <div class="field"><label>Subject / Focus</label><select id="logSubject"><option>SAT Math</option><option>SAT Reading</option><option>SAT Writing &amp; Language</option><option>Full Practice Test</option><option>Practice Section</option><option>Error Log Review</option><option>Vocabulary Drills</option><option>School Homework</option><option>Other</option></select></div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label>Start time</label><input type="time" id="logStart"></div>
+          <div class="field"><label>End time</label><input type="time" id="logEnd"></div>
+        </div>
+        <div class="field"><label>Notes</label><input type="text" id="logNotes" placeholder="What you worked on"></div>
+        <button class="btn" onclick="addSession()">Log Session</button>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Session History</h2>
+        <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Time</th><th>Hours</th><th>Subject</th><th>Notes</th><th></th></tr></thead><tbody id="sessionTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- SAT SCORES -->
+    <section id="scores" class="section">
+      <div class="page-head"><h2>SAT Scores</h2><p class="desc">Log every practice test to watch your trend climb toward 1450.</p></div>
+      <div class="card">
+        <h2>Log a Practice Test Score</h2>
+        <div class="two-col">
+          <div class="field"><label>Date</label><input type="date" id="scoreDate"></div>
+          <div class="field"><label>Total (400-1600)</label><input type="number" min="400" max="1600" id="scoreTotal" placeholder="1200"></div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label>Math (200-800)</label><input type="number" min="200" max="800" id="scoreMath" placeholder="600"></div>
+          <div class="field"><label>R&amp;W (200-800)</label><input type="number" min="200" max="800" id="scoreRW" placeholder="600"></div>
+        </div>
+        <div class="field"><label>Test name / notes</label><input type="text" id="scoreNotes" placeholder="Bluebook Practice Test 4"></div>
+        <button class="btn" onclick="addScore()">Log Score</button>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Score History</h2>
+        <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Total</th><th>Math</th><th>R&amp;W</th><th>Notes</th><th></th></tr></thead><tbody id="scoreTable"></tbody></table></div>
+        <div style="margin-top:14px"><h3>Score Trend</h3><div class="chart" id="scoreChart"></div></div>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="section">
+      <div class="page-head"><h2>Portfolio &amp; Self-Development</h2><p class="desc">Weekly target: 5 hours across AI/CS projects. This is what admissions committees see.</p></div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:8px">
+          <h2 style="margin:0">Projects</h2>
+          <button class="btn" onclick="openProjModal()">+ Add Project</button>
+        </div>
+        <div class="stat-row" id="portStats"></div>
+        <div id="projList"></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Log Portfolio Hours</h2>
+        <div id="portStudyStatus" class="muted" style="font-size:12px;margin-bottom:10px"></div>
+        <div class="two-col">
+          <div class="field"><label>Date</label><input type="date" id="portDate"></div>
+          <div class="field"><label>Hours</label><input type="number" step="0.25" min="0" id="portHours"></div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label>Project</label><select id="portProject"></select></div>
+          <div class="field"><label>Notes</label><input type="text" id="portNotes"></div>
+        </div>
+        <div class="field"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" class="checkbox" id="portOverride"><span>Daily SAT study not completed (log anyway)</span></label></div>
+        <button class="btn" onclick="addPortSession()">Log Hours</button>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Session History</h2>
+        <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Hours</th><th>Project</th><th>Notes</th><th></th></tr></thead><tbody id="portTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section id="schedule" class="section">
+      <div class="page-head"><h2>Schedule</h2><p class="desc">A weekly rhythm plus a day-by-day plan through test day.</p></div>
+      <div class="card">
+        <h2>Detailed Weekly Schedule</h2>
+        <div style="overflow-x:auto"><table><thead><tr><th>Day</th><th>SAT Study</th><th>Portfolio</th><th>Checkpoint</th></tr></thead><tbody id="weeklySchedule"></tbody></table></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>31-Day Milestones</h2>
+        <ul class="list" id="milestones"></ul>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Day-by-Day Plan</h2>
+        <div style="overflow-x:auto;max-height:460px;overflow-y:auto">
+          <table><thead><tr><th>Date</th><th>Phase</th><th>SAT Focus</th><th>Portfolio</th><th>Checkpoint</th></tr></thead><tbody id="dayPlanTable"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section id="resources" class="section">
+      <div class="page-head"><h2>Study Resources</h2><p class="desc">Curated and prioritized for the 1200 → 1450+ jump.</p></div>
+      <div class="card">
+        <div id="resourceList"></div>
+      </div>
+    </section>
+
+    <!-- GOALS -->
+    <section id="goals" class="section">
+      <div class="page-head"><h2>Goals &amp; Milestones</h2><p class="desc">Set targets with a date, then check them off as you hit them.</p></div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:8px">
+          <div class="row" style="gap:6px">
+            <button class="toggle-btn active" id="goalListBtn" onclick="setGoalView('list')">List</button>
+            <button class="toggle-btn" id="goalCalBtn" onclick="setGoalView('calendar')">Calendar</button>
+          </div>
+          <button class="btn" onclick="openGoalModal()">+ Add Goal</button>
+        </div>
+        <div id="goalsList"></div>
+        <div id="goalsCalendar" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- ADMIN CONSOLE (admin only) -->
+    <section id="admin" class="section">
+      <div class="page-head"><h2>Admin Console</h2><p class="desc">Student management, homework, grading, and progress tracking.</p></div>
+      <div class="card">
+        <div class="toggle-row">
+          <button class="toggle-btn active" id="adminOverviewBtn" onclick="setAdminView('overview')">Overview</button>
+          <button class="toggle-btn" id="adminGradeBtn" onclick="setAdminView('grade')">Grading Queue</button>
+          <button class="toggle-btn" id="adminProgressBtn" onclick="setAdminView('progress')">Student Progress</button>
+          <button class="toggle-btn" id="adminMessageBtn" onclick="setAdminView('message')">Message</button>
+          <button class="toggle-btn" id="adminDataBtn" onclick="setAdminView('data')">Data Control</button>
+        </div>
+      </div>
+
+      <!-- Assign homework lives as a modal (opened from Overview or Assignments) -->
+      <div id="adminAssign" class="hidden"></div>
+
+      <!-- Overview -->
+      <div id="adminOverview" class="card" style="margin-top:12px">
+        <h2>Student Overview</h2>
+        <div id="adminOverviewBody"></div>
+        <h3>Roster</h3>
+        <div class="roster" id="roster"></div>
+      </div>
+
+      <!-- Grading Queue -->
+      <div id="adminGrade" class="card hidden" style="margin-top:12px">
+        <h2>Grading Queue</h2>
+        <p class="muted" style="font-size:13px;margin-bottom:10px">Submitted and assigned homework awaiting review.</p>
+        <div id="gradeQueue"></div>
+      </div>
+
+      <!-- Student Progress -->
+      <div id="adminProgress" class="card hidden" style="margin-top:12px">
+        <h2>Student Progress</h2>
+        <div id="studentSelectRow" class="field" style="max-width:260px"><label>Student</label><select id="progressStudent" onchange="renderProgress()"></select></div>
+        <div class="stat-row" id="progressStats"></div>
+        <div class="two-col">
+          <div class="panel"><h3>Score Trend</h3><div class="chart" id="progressScoreChart"></div></div>
+          <div class="panel"><h3>Study Hours (last 14 days)</h3><div class="chart" id="progressStudyChart"></div></div>
+        </div>
+        <div class="panel" style="margin-top:10px"><h3>Homework Status</h3><div id="progressHw"></div></div>
+        <div class="panel" style="margin-top:10px"><h3>Recent Activity</h3><ul class="list" id="progressActivity"></ul></div>
+      </div>
+
+      <!-- Message -->
+      <div id="adminMessage" class="card hidden" style="margin-top:12px">
+        <h2>Message a Student</h2>
+        <div class="composer">
+          <div class="field"><label>Recipient</label><select id="msgStudent"><option value="">All students</option></select></div>
+          <div class="field"><label>Subject</label><input id="msgTitle" placeholder="e.g. Reminder: submit practice test 2"></div>
+          <div class="field"><label>Message</label><textarea id="msgBody" rows="4" placeholder="Type your message..."></textarea></div>
+          <button class="btn" onclick="sendMessage()">Send</button>
+        </div>
+        <div style="margin-top:12px" id="sentMessages"></div>
+      </div>
+
+      <!-- Data Control -->
+      <div id="adminData" class="card hidden" style="margin-top:12px">
+        <h2>Data Control</h2>
+        <p class="muted" style="font-size:13px;margin-bottom:10px">View/edit/delete student entries.</p>
+        <div class="two-col" style="max-width:560px">
+          <div class="field"><label>Table</label><select id="dataTabSel" onchange="loadDataControl()"><option value="study_sessions">Study Sessions</option><option value="scores">Scores</option><option value="goals">Goals</option><option value="projects">Projects</option><option value="port_sessions">Portfolio Sessions</option><option value="homework">Homework</option></select></div>
+          <div class="field"><label>Student</label><select id="dataStudentSel" onchange="loadDataControl()"></select></div>
+        </div>
+        <div style="overflow-x:auto"><table><thead id="dataHead"></thead><tbody id="dataTable"></tbody></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+</div>
+
+<!-- Notification panel -->
 <div class="notif-panel" id="notifPanel"></div>
-<nav id="mainNav">
-  <button class="active" data-tab="dashboard">Dashboard</button>
-  <button data-tab="assignments">Assignments</button>
-  <button data-tab="studylog">Study Log</button>
-  <button data-tab="scores">SAT Scores</button>
-  <button data-tab="portfolio">Portfolio</button>
-  <button data-tab="schedule">Schedule</button>
-  <button data-tab="resources">Resources</button>
-  <button data-tab="goals">Goals</button>
-  <button data-tab="admin" id="adminTab" class="hidden">Admin Console</button>
-</nav>
-<main>
-
-<!-- DASHBOARD -->
-<section id="dashboard" class="section active">
-  <div class="hero">
-    <h2>Mission: 1200 → 1450+ in 31 days</h2>
-    <p class="muted" style="font-size:13px;margin-top:4px">Test date December 5, 2026 · Need +250 points · ~8 points per day</p>
-    <div class="countdown" id="countdownText">Loading…</div>
-  </div>
-  <div class="grid">
-    <div class="card"><h2>Score Progress</h2><div class="big" id="currentScore">1200</div><div class="muted" style="font-size:13px;margin-top:4px">Current score toward 1450+</div><div class="progress" style="margin-top:12px"><div id="scoreBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px" id="scorePct">0% of the way</div></div>
-    <div class="card"><h2>Today's Study Hours</h2><div class="big" id="todayHours">0</div><div class="muted" style="font-size:13px;margin-top:4px">of the 3-4 hour daily promise</div><div class="progress" style="margin-top:12px"><div id="todayBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px" id="todayStatus">—</div></div>
-    <div class="card"><h2>This Week</h2><div class="big" id="weekHours">0</div><div class="muted" style="font-size:13px;margin-top:4px">SAT study hours logged</div><div class="progress" style="margin-top:12px"><div id="weekBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px">Portfolio: <b id="portWeek">0.0</b> / 5.0 h</div></div>
-    <div class="card"><h2>Assignments</h2><div class="big" id="assignDone">0</div><div class="muted" style="font-size:13px;margin-top:4px">completed of <span id="assignTotal">0</span></div><div class="progress" style="margin-top:12px"><div id="assignBar" style="width:0%"></div></div><div class="muted" style="margin-top:6px;font-size:12px" id="assignStatus">—</div></div>
-  </div>
-  <div class="two-col">
-    <div class="card"><h2>Recent Study Sessions</h2><ul class="list" id="recentSessions"></ul></div>
-    <div class="card"><h2>Upcoming Homework</h2><ul class="list" id="upcomingAssign"></ul></div>
-  </div>
-  <div class="card"><h2>Weekly Study Hours (last 7 days)</h2><div class="chart" id="weekChart"></div></div>
-</section>
-
-<!-- ASSIGNMENTS -->
-<section id="assignments" class="section">
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:10px">
-      <h2 style="margin:0">Assignments</h2>
-      <div class="row" style="gap:6px">
-        <button class="btn secondary sm" onclick="openAssignModal()">+ Personal Task</button>
-        <button class="btn sm" id="assignHwBtn" onclick="openAssignHwModal()" style="display:none">+ Assign Homework</button>
-      </div>
-    </div>
-    <div class="field" style="max-width:240px"><label>Filter by</label>
-      <select id="assignFilter" onchange="renderAssignments()">
-        <option value="all">All</option><option value="todo">To Do</option><option value="doing">In Progress</option>
-        <option value="done">Done</option><option value="homework">Homework</option><option value="sat">SAT Prep</option>
-        <option value="portfolio">Portfolio</option><option value="school">School</option>
-      </select></div>
-    <div class="kanban">
-      <div class="kanban-col"><h4>To Do</h4><div id="col-todo"></div></div>
-      <div class="kanban-col"><h4>In Progress</h4><div id="col-doing"></div></div>
-      <div class="kanban-col"><h4>Done</h4><div id="col-done"></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- STUDY LOG -->
-<section id="studylog" class="section">
-  <div class="card">
-    <h2>Log a Study Session</h2>
-    <p class="muted" style="font-size:12px;margin-bottom:10px">Track multiple sessions per day with start/end times.</p>
-    <div class="two-col">
-      <div class="field"><label>Date</label><input type="date" id="logDate"></div>
-      <div class="field"><label>Subject / Focus</label><select id="logSubject"><option>SAT Math</option><option>SAT Reading</option><option>SAT Writing & Language</option><option>Full Practice Test</option><option>Practice Section</option><option>Error Log Review</option><option>Vocabulary Drills</option><option>School Homework</option><option>Other</option></select></div>
-    </div>
-    <div class="two-col">
-      <div class="field"><label>Start time</label><input type="time" id="logStart"></div>
-      <div class="field"><label>End time</label><input type="time" id="logEnd"></div>
-    </div>
-    <div class="field"><label>Notes</label><input type="text" id="logNotes" placeholder="What you worked on"></div>
-    <button class="btn" onclick="addSession()">Log Session</button>
-  </div>
-  <div class="card">
-    <h2>Session History</h2>
-    <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Time</th><th>Hours</th><th>Subject</th><th>Notes</th><th></th></tr></thead><tbody id="sessionTable"></tbody></table></div>
-  </div>
-</section>
-
-<!-- SAT SCORES -->
-<section id="scores" class="section">
-  <div class="card">
-    <h2>Log a Practice Test Score</h2>
-    <div class="two-col">
-      <div class="field"><label>Date</label><input type="date" id="scoreDate"></div>
-      <div class="field"><label>Total (400-1600)</label><input type="number" min="400" max="1600" id="scoreTotal" placeholder="1200"></div>
-    </div>
-    <div class="two-col">
-      <div class="field"><label>Math (200-800)</label><input type="number" min="200" max="800" id="scoreMath" placeholder="600"></div>
-      <div class="field"><label>R&W (200-800)</label><input type="number" min="200" max="800" id="scoreRW" placeholder="600"></div>
-    </div>
-    <div class="field"><label>Test name / notes</label><input type="text" id="scoreNotes" placeholder="Bluebook Practice Test 4"></div>
-    <button class="btn" onclick="addScore()">Log Score</button>
-  </div>
-  <div class="card">
-    <h2>Score History</h2>
-    <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Total</th><th>Math</th><th>R&W</th><th>Notes</th><th></th></tr></thead><tbody id="scoreTable"></tbody></table></div>
-    <div style="margin-top:14px"><h3>Score Trend</h3><div class="chart" id="scoreChart"></div></div>
-  </div>
-</section>
-
-<!-- PORTFOLIO -->
-<section id="portfolio" class="section">
-  <div class="card" id="portProjCard">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px">
-      <h2 style="margin:0">Portfolio &amp; Self-Development Projects</h2>
-      <button class="btn" onclick="openProjModal()">+ Add Project</button>
-    </div>
-    <p class="muted" style="font-size:13px;margin-bottom:10px">Weekly target: 5 hours across projects.</p>
-    <div class="stat-row" id="portStats"></div>
-    <div id="projList"></div>
-  </div>
-  <div class="card" id="portLogCard">
-    <h2>Log Portfolio Hours</h2>
-    <div id="portStudyStatus" class="muted" style="font-size:12px;margin-bottom:10px"></div>
-    <div class="two-col">
-      <div class="field"><label>Date</label><input type="date" id="portDate"></div>
-      <div class="field"><label>Hours</label><input type="number" step="0.25" min="0" id="portHours"></div>
-    </div>
-    <div class="two-col">
-      <div class="field"><label>Project</label><select id="portProject"></select></div>
-      <div class="field"><label>Notes</label><input type="text" id="portNotes"></div>
-    </div>
-    <div class="field"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" class="checkbox" id="portOverride"><span>Daily SAT study not completed (log anyway)</span></label></div>
-    <button class="btn" onclick="addPortSession()">Log Hours</button>
-  </div>
-  <div class="card" id="portHistoryCard">
-    <h2>Portfolio Session History</h2>
-    <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Hours</th><th>Project</th><th>Notes</th><th></th></tr></thead><tbody id="portTable"></tbody></table></div>
-  </div>
-</section>
-
-<!-- SCHEDULE -->
-<section id="schedule" class="section">
-  <div class="card">
-    <h2>Detailed Weekly Schedule</h2>
-    <p class="muted" style="font-size:13px;margin-bottom:10px">3-4h daily SAT study + 5h/week portfolio.</p>
-    <div style="overflow-x:auto"><table><thead><tr><th>Day</th><th>SAT Study</th><th>Portfolio</th><th>Checkpoint</th></tr></thead><tbody>
-      <tr><td><b>Mon</b></td><td>Math Algebra 1.5h + R&W grammar 1.5h</td><td>0.7h AI project</td><td>Review weekend errors</td></tr>
-      <tr><td><b>Tue</b></td><td>Reading evidence 2h + Math data analysis 1.5h</td><td>0.7h AI project</td><td>Vocab 15 words</td></tr>
-      <tr><td><b>Wed</b></td><td>Writing expression 1.5h + Math advanced 1.5h</td><td>0.7h portfolio polish</td><td>Mini quiz</td></tr>
-      <tr><td><b>Thu</b></td><td>Math geometry/trig 2h + R&W 1.5h</td><td>0.7h AI project</td><td>Weak topics review</td></tr>
-      <tr><td><b>Fri</b></td><td>Practice section 2h + error log 1.5h</td><td>0.7h self-dev reading</td><td>Track accuracy</td></tr>
-      <tr><td><b>Sat</b></td><td>Full practice test 3h + review 1h</td><td>—</td><td>Weekly assessment</td></tr>
-      <tr><td><b>Sun</b></td><td>Targeted drills 2h + timing 1h</td><td>2h portfolio</td><td>Plan next week</td></tr>
-    </tbody></table></div>
-  </div>
-  <div class="card">
-    <h2>31-Day Milestones</h2>
-    <ul class="list">
-      <li><span><b>Wk1 (Nov 4-10):</b> Baseline diagnostic, identify weak areas</span><span class="pill info">1200→1260</span></li>
-      <li><span><b>Wk2 (Nov 11-17):</b> Targeted skill building, 2 practice tests</span><span class="pill info">1260→1320</span></li>
-      <li><span><b>Wk3 (Nov 18-24):</b> Integration, timing, error-log mastery</span><span class="pill info">1320→1390</span></li>
-      <li><span><b>Wk4 (Nov 25-Dec 1):</b> Polish, stamina, finalize portfolio</span><span class="pill info">1390→1440+</span></li>
-      <li><span><b>Dec 2-4:</b> Taper, rest, test-day prep</span><span class="pill good">Ready</span></li>
-      <li><span><b>Dec 5:</b> SAT Test Day 🎯</span><span class="pill warn">Test</span></li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>Day-by-Day Plan (Nov 4 – Dec 5)</h2>
-    <div style="overflow-x:auto;max-height:420px;overflow-y:auto">
-      <table><thead><tr><th>Date</th><th>Phase</th><th>SAT Focus</th><th>Portfolio</th><th>Checkpoint</th></tr></thead><tbody id="dayPlanTable"></tbody></table>
-    </div>
-  </div>
-</section>
-
-<!-- RESOURCES -->
-<section id="resources" class="section">
-  <div class="card">
-    <h2>Study Resources to Reach 1450+</h2>
-    <h3>Official (Free)</h3>
-    <div class="resource"><div class="title">College Board Bluebook App</div><div class="meta">Official · Free · 6+ tests</div><div class="desc">Same format as real digital SAT. Take at least 6 full tests.</div></div>
-    <div class="resource"><div class="title">Khan Academy Official SAT Practice</div><div class="meta">Official partner · Free · Personalized</div><div class="desc">Links to College Board account. Targeted skill building.</div></div>
-    <div class="resource"><div class="title">College Board Question Bank</div><div class="meta">Official · Free · Topic-filtered</div><div class="desc">Drill weak areas by skill/domain.</div></div>
-    <h3>Math (Target: 700+)</h3>
-    <div class="resource"><div class="title">PWN the SAT: Math Guide</div><div class="meta">Book · Strategy</div><div class="desc">Great for jumping 600 → 700+.</div></div>
-    <div class="resource"><div class="title">Dr. John Chung's SAT Math</div><div class="meta">Book · Advanced</div><div class="desc">Hardest math practice. Final 2 weeks.</div></div>
-    <div class="resource"><div class="title">Target Test Prep (SAT Math)</div><div class="meta">Online · Paid · Structured</div><div class="desc">Comprehensive with analytics.</div></div>
-    <h3>Reading & Writing (Target: 700+)</h3>
-    <div class="resource"><div class="title">Erica Meltzer — The Critical Reader</div><div class="meta">Book · Reading</div><div class="desc">Gold standard for SAT reading.</div></div>
-    <div class="resource"><div class="title">Erica Meltzer — SAT Grammar</div><div class="meta">Book · Grammar</div><div class="desc">Every grammar rule tested.</div></div>
-    <div class="resource"><div class="title">1600.io</div><div class="meta">Online · Video walkthroughs</div><div class="desc">Detailed explanations of official tests.</div></div>
-    <h3>Drills & Strategy</h3>
-    <div class="resource"><div class="title">UWorld SAT</div><div class="meta">Online · Paid · High quality</div><div class="desc">Great explanations and analytics.</div></div>
-    <div class="resource"><div class="title">SAT Black Book</div><div class="meta">Book · Strategy</div><div class="desc">Exploit the test's design.</div></div>
-    <h3>AI / CS Portfolio (5h/week)</h3>
-    <div class="resource"><div class="title">fast.ai — Practical Deep Learning</div><div class="meta">Free course</div><div class="desc">Hands-on deep learning projects.</div></div>
-    <div class="resource"><div class="title">CS50 (Harvard)</div><div class="meta">Free · edX</div><div class="desc">CS fundamentals.</div></div>
-    <div class="resource"><div class="title">Kaggle Learn</div><div class="meta">Free · Micro-courses</div><div class="desc">Python, ML, data viz.</div></div>
-    <div class="resource"><div class="title">GitHub + Personal Website</div><div class="meta">Free · Portfolio</div><div class="desc">Showcase projects for US apps.</div></div>
-    <div class="resource"><div class="title">LeetCode / Codeforces</div><div class="meta">Free · Algorithms</div><div class="desc">Problem-solving for CS programs.</div></div>
-  </div>
-</section>
-
-<!-- GOALS -->
-<section id="goals" class="section">
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px">
-      <h2 style="margin:0">Goals &amp; Milestones</h2>
-      <div class="row" style="gap:6px">
-        <button class="toggle-btn active" id="goalListBtn" onclick="setGoalView('list')">List</button>
-        <button class="toggle-btn" id="goalCalBtn" onclick="setGoalView('calendar')">Calendar</button>
-      </div>
-    </div>
-    <div id="goalsList"></div>
-    <div id="goalsCalendar" style="display:none"></div>
-    <button class="btn" style="margin-top:10px" onclick="openGoalModal()">+ Add Goal with Target Date</button>
-  </div>
-</section>
-
-<!-- ADMIN CONSOLE (admin only) -->
-<section id="admin" class="section">
-  <div class="card">
-    <h2>Admin Console</h2>
-    <p class="muted" style="font-size:13px;margin-bottom:12px">Grade submissions, track progress, and manage data. Use "Assign Homework" on the Assignments page.</p>
-    <div class="toggle-row" style="margin-bottom:12px">
-      <button class="toggle-btn active" id="adminGradeBtn" onclick="setAdminView('grade')">Grading Queue</button>
-      <button class="toggle-btn" id="adminProgressBtn" onclick="setAdminView('progress')">Student Progress</button>
-      <button class="toggle-btn" id="adminDataBtn" onclick="setAdminView('data')">Data Control</button>
-    </div>
-  </div>
-
-  <!-- Assign Homework moved to modal (Assignments page button) -->
-  <div id="adminAssign" class="hidden"></div>
-
-  <!-- Grading Queue -->
-  <div id="adminGrade" class="card hidden">
-    <h2>Grading Queue</h2>
-    <p class="muted" style="font-size:13px;margin-bottom:10px">Submitted and assigned homework awaiting review.</p>
-    <div id="gradeQueue"></div>
-  </div>
-
-  <!-- Student Progress -->
-  <div id="adminProgress" class="card hidden">
-    <h2>Student Progress — Egahan</h2>
-    <div id="studentSelectRow" class="field" style="max-width:260px"><label>Student</label><select id="progressStudent"></select></div>
-    <div class="stat-row" id="progressStats"></div>
-    <div class="two-col">
-      <div class="card" style="background:var(--panel2)"><h3>Score Trend</h3><div class="chart" id="progressScoreChart"></div></div>
-      <div class="card" style="background:var(--panel2)"><h3>Study Hours (last 14 days)</h3><div class="chart" id="progressStudyChart"></div></div>
-    </div>
-    <div class="card" style="background:var(--panel2);margin-top:10px">
-      <h3>Homework Status</h3>
-      <div id="progressHw"></div>
-    </div>
-    <div class="card" style="background:var(--panel2);margin-top:10px">
-      <h3>Recent Activity</h3>
-      <ul class="list" id="progressActivity"></ul>
-    </div>
-  </div>
-
-  <!-- Data Control -->
-  <div id="adminData" class="card hidden">
-    <h2>Data Control</h2>
-    <p class="muted" style="font-size:13px;margin-bottom:10px">View/edit/delete student entries.</p>
-    <div class="field" style="max-width:260px"><label>Table</label><select id="dataTabSel" onchange="loadDataControl()"><option value="study_sessions">Study Sessions</option><option value="scores">Scores</option><option value="goals">Goals</option><option value="projects">Projects</option><option value="port_sessions">Portfolio Sessions</option><option value="homework">Homework</option></select></div>
-    <div class="field" style="max-width:260px"><label>Student</label><select id="dataStudentSel" onchange="loadDataControl()"></select></div>
-    <div style="overflow-x:auto"><table><thead id="dataHead"></thead><tbody id="dataTable"></tbody></table></div>
-  </div>
-</section>
-
-</main>
 
 <!-- Modals -->
 <div class="modal-back" id="assignModal">
@@ -480,7 +363,7 @@
       <div class="field"><label>Due date</label><input type="date" id="hwDue"></div>
       <div class="field"><label>Assign to</label><select id="hwStudent"></select></div>
     </div>
-    <div class="card" style="background:var(--panel2);margin-bottom:10px">
+    <div class="card" style="background:var(--surface-2);margin-bottom:10px">
       <h3 style="margin-top:0">Attachments (URLs, PDFs, videos, docs)</h3>
       <div id="attachList"></div>
       <div class="two-col">
@@ -516,833 +399,13 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-// ============================================================
-// CONFIG — paste your Supabase keys here (see README.md)
-// ============================================================
-const SUPABASE_URL = 'https://sdagconjpfzvddxocybp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkYWdjb25qcGZ6dmRkeG9jeWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM4MTQxNjksImV4cCI6MjEwOTM5MDE2OX0.iDKwt-ybtiIttdlMsom236IUNGeGmHxxl3IcNZRrrU4';
-
-// ---------- state ----------
-let sb = null;
-let currentUser = null;   // auth user
-let currentProfile = null; // profiles row
-let isAdmin = false;
-
-let assignments = []; // personal assignments (student-owned) + homework merged at render
-let homework = [];    // admin-assigned
-let sessions = [];
-let scores = [];
-let projects = [];
-let portSessions = [];
-let goals = [];
-let notifications = [];
-let students = [];    // admin: list of student profiles
-let hwAttachments = {}; // homework_id -> array
-let pendingAttachments = []; // for assign form
-
-const DAY_PLAN = [
- {d:'2026-11-04',ph:'P1 Baseline',sat:'Diagnostic: Bluebook Test 1 (full, timed). Log score. Start error log.',port:'0.5h: create AI project repo',chk:'Baseline recorded'},
- {d:'2026-11-05',ph:'P1 Baseline',sat:'Error review. Math: Heart of Algebra. R&W: punctuation.',port:'0.5h: dataset search',chk:'Weak domains identified'},
- {d:'2026-11-06',ph:'P1 Baseline',sat:'Math: Problem Solving & Data Analysis. Reading: Craft & Structure.',port:'0.7h: data pipeline',chk:'Khan plan set'},
- {d:'2026-11-07',ph:'P1 Baseline',sat:'Bluebook Test 2. Log & review top 10 mistakes.',port:'—',chk:'Score trend started'},
- {d:'2026-11-08',ph:'P1 Baseline',sat:'Drills on weak skills (25 Q). Vocab 15.',port:'0.7h: model skeleton',chk:'Weak-skill drill done'},
- {d:'2026-11-09',ph:'P1 Baseline',sat:'Math: Advanced Math (quadratics). R&W: Conventions.',port:'0.7h: training script',chk:'Algebra progress'},
- {d:'2026-11-10',ph:'P1 Baseline',sat:'Reading: Evidence & Inference. Math: geometry basics.',port:'0.7h: eval metrics',chk:'Week 1 complete'},
- {d:'2026-11-11',ph:'P2 Skills',sat:'Math: quadratics & exponentials. Writing: Expression of Ideas.',port:'0.7h: feature build',chk:'Advanced math'},
- {d:'2026-11-12',ph:'P2 Skills',sat:'Reading: central idea. Math: geometry area/volume.',port:'0.7h: portfolio polish',chk:'Reading accuracy up'},
- {d:'2026-11-13',ph:'P2 Skills',sat:'Bluebook Test 3. Log, review, categorize.',port:'—',chk:'Mid-point score'},
- {d:'2026-11-14',ph:'P2 Skills',sat:'Drills (30 Q). Vocab 15. Grammar units.',port:'0.7h: README',chk:'Grammar covered'},
- {d:'2026-11-15',ph:'P2 Skills',sat:'Math: systems of equations. R&W: paired passages.',port:'0.7h: commit & deploy',chk:'Systems mastery'},
- {d:'2026-11-16',ph:'P2 Skills',sat:'Math: data analysis scatterplots. Reading: words in context.',port:'0.7h: self-dev reading',chk:'Data analysis solid'},
- {d:'2026-11-17',ph:'P2 Skills',sat:'Bluebook Test 4. Review. Update error log.',port:'—',chk:'Week 2 complete'},
- {d:'2026-11-18',ph:'P3 Integrate',sat:'Timing: R&W paced. Math: advanced polynomials.',port:'0.7h: feature build',chk:'Pacing on track'},
- {d:'2026-11-19',ph:'P3 Integrate',sat:'Math: geometry & trig (unit circle). Reading: inference.',port:'0.7h: code review',chk:'Trig basics'},
- {d:'2026-11-20',ph:'P3 Integrate',sat:'Bluebook Test 5. Score, log, review.',port:'—',chk:'Score climbing'},
- {d:'2026-11-21',ph:'P3 Integrate',sat:'Error-log mastery: re-attempt all missed.',port:'0.7h: portfolio polish',chk:'Error log cleared'},
- {d:'2026-11-22',ph:'P3 Integrate',sat:'Pacing practice (finish 2 min spare). Math: problem solving.',port:'0.7h: self-dev reading',chk:'Timing comfortable'},
- {d:'2026-11-23',ph:'P3 Integrate',sat:'Reading: craft & structure. Writing: transitions.',port:'0.7h: feature build',chk:'R&W accuracy up'},
- {d:'2026-11-24',ph:'P3 Integrate',sat:'Bluebook Test 6. Full review. Update chart.',port:'—',chk:'Week 3 complete'},
- {d:'2026-11-25',ph:'P4 Polish',sat:'Dr. Chung math test 1. Vocab 25 words.',port:'0.7h: finalize v1',chk:'Math ceiling pushed'},
- {d:'2026-11-26',ph:'P4 Polish',sat:'Full timed simulation. Error review.',port:'—',chk:'Stamina built'},
- {d:'2026-11-27',ph:'P4 Polish',sat:'Light drills. Portfolio finalize.',port:'2h: polish + deploy',chk:'Portfolio v1 done'},
- {d:'2026-11-28',ph:'P4 Polish',sat:'Bluebook Test 7 (or repeat weakest). Review.',port:'—',chk:'Consistency check'},
- {d:'2026-11-29',ph:'P4 Polish',sat:'Timing + stamina. Weak-skill drills.',port:'0.7h: self-dev reading',chk:'Pace locked'},
- {d:'2026-11-30',ph:'P4 Polish',sat:'Final practice test. Vocab 100+ review.',port:'0.7h: final commits',chk:'Final score push'},
- {d:'2026-12-01',ph:'P4 Polish',sat:'Light review: error log + vocab. No new content.',port:'—',chk:'Taper begins'},
- {d:'2026-12-02',ph:'P5 Taper',sat:'Error log review only (30 min). Vocab flashcards.',port:'0.5h: light reading',chk:'Rest & recover'},
- {d:'2026-12-03',ph:'P5 Taper',sat:'Light review only. Sleep 8h. Hydrate.',port:'—',chk:'Test prep'},
- {d:'2026-12-04',ph:'P5 Taper',sat:'Pack calculator, ticket, snacks. Visualize. Early sleep.',port:'—',chk:'Ready'},
- {d:'2026-12-05',ph:'TEST DAY',sat:'SAT Test Day. Arrive 30 min early. Target 1450+.',port:'—',chk:'🎯 Test Day'},
-];
-
-// ---------- helpers ----------
-function escape(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function todayStr(){ return new Date().toISOString().slice(0,10); }
-function weekStart(){ const d=new Date(); d.setDate(d.getDate()-d.getDay()); return d.toISOString().slice(0,10); }
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
-function closeModal(id){ document.getElementById(id).classList.remove('show'); }
-function hoursBetween(s,e){ if(!s||!e) return 0; const [sh,sm]=s.split(':').map(Number); const [eh,em]=e.split(':').map(Number); let m=(eh*60+em)-(sh*60+sm); if(m<0) m+=24*60; return Math.round(m/60*100)/100; }
-
-// ---------- config check ----------
-function isConfigured(){ return SUPABASE_URL && !SUPABASE_URL.includes('YOUR_') && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes('YOUR_'); }
-
-function saveSetup(){
-  const u = document.getElementById('setupUrl').value.trim();
-  const k = document.getElementById('setupKey').value.trim();
-  if(!u||!k){ toast('Both fields required'); return; }
-  localStorage.setItem('sb_url', u);
-  localStorage.setItem('sb_key', k);
-  location.reload();
-}
-
-// ---------- init ----------
-async function init(){
-  // allow override from localStorage (saved via setup screen)
-  const savedUrl = localStorage.getItem('sb_url');
-  const savedKey = localStorage.getItem('sb_key');
-  if(savedUrl && savedKey){ window.__SB_URL=savedUrl; window.__SB_KEY=savedKey; }
-  const url = window.__SB_URL || SUPABASE_URL;
-  const key = window.__SB_KEY || SUPABASE_ANON_KEY;
-
-  if(!isConfigured() && !(savedUrl && savedKey)){
-    document.getElementById('setupScreen').classList.remove('hidden');
-    return;
-  }
-  sb = supabase.createClient(url, key);
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if(session){ await onLogin(session.user); }
-    else { showAuth(); }
-  });
-  const { data } = await sb.auth.getSession();
-  if(data.session){ await onLogin(data.session.user); }
-  else { showAuth(); }
-}
-
-function showAuth(){ document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('app').classList.add('hidden'); }
-function showApp(){ document.getElementById('authScreen').classList.add('hidden'); document.getElementById('setupScreen').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); }
-
-let authMode = 'signin';
-function toggleAuthMode(){
-  authMode = authMode==='signin'?'signup':'signin';
-  document.getElementById('authTitle').textContent = authMode==='signin'?'Sign in':'Sign up';
-  document.getElementById('authSub').textContent = authMode==='signin'?'Access your SAT planner.':'Create your account.';
-  document.getElementById('authBtn').textContent = authMode==='signin'?'Sign in':'Sign up';
-  document.getElementById('authToggle').textContent = authMode==='signin'?'Need an account? Sign up':'Already have an account? Sign in';
-  document.getElementById('authNameField').classList.toggle('hidden', authMode!=='signup');
-}
-async function doAuth(){
-  const email = document.getElementById('authEmail').value.trim();
-  const pass = document.getElementById('authPass').value;
-  const name = document.getElementById('authName').value.trim();
-  const err = document.getElementById('authErr');
-  err.textContent = '';
-  try {
-    if(authMode==='signup'){
-      const { error } = await sb.auth.signUp({ email, password: pass, options: { data: { display_name: name||email.split('@')[0] } } });
-      if(error) throw error;
-      toast('Account created. Check email if confirmation required, then sign in.');
-      authMode='signin'; toggleAuthMode();
-    } else {
-      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-      if(error) throw error;
-    }
-  } catch(e){ err.textContent = e.message; }
-}
-async function doLogout(){ await sb.auth.signOut(); location.reload(); }
-
-async function onLogin(user){
-  currentUser = user;
-  const { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
-  currentProfile = prof;
-  isAdmin = prof?.role === 'admin';
-
-  // header
-  document.getElementById('userName').textContent = prof?.display_name || user.email;
-  document.getElementById('userAvatar').textContent = (prof?.display_name||user.email).slice(0,2).toUpperCase();
-  const rb = document.getElementById('userRole'); rb.textContent = prof?.role||'student'; rb.className = 'role-badge '+(prof?.role||'student');
-  if(isAdmin) { document.getElementById('adminTab').classList.remove('hidden'); const b=document.getElementById('assignHwBtn'); if(b) b.style.display=''; }
-
-  showApp();
-  await loadAll();
-  renderAll();
-  subscribeRealtime();
-}
-
-// ---------- data loading ----------
-async function loadAll(){
-  const uid = currentUser.id;
-  // personal data (student's own)
-  const [s, sc, p, ps, g, hw, n] = await Promise.all([
-    sb.from('study_sessions').select('*').eq('user_id', uid).order('date',{ascending:false}),
-    sb.from('scores').select('*').eq('user_id', uid).order('date',{ascending:false}),
-    sb.from('projects').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
-    sb.from('port_sessions').select('*').eq('user_id', uid).order('date',{ascending:false}),
-    sb.from('goals').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
-    isAdmin
-      ? sb.from('homework').select('*').order('created_at',{ascending:false})
-      : sb.from('homework').select('*').eq('assigned_to', uid).order('created_at',{ascending:false}),
-    sb.from('notifications').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
-  ]);
-  sessions = s.data||[];
-  scores = sc.data||[];
-  projects = p.data||[];
-  portSessions = ps.data||[];
-  goals = g.data||[];
-  homework = hw.data||[];
-  notifications = n.data||[];
-
-  // personal assignments (stored as homework? we keep a separate lightweight table? use homework only)
-  // For personal tasks, reuse goals? We'll keep a local "assignments" array from homework for student view.
-  // Admin needs student list
-  if(isAdmin){
-    const { data: studs } = await sb.from('profiles').select('*').eq('role','student');
-    students = studs||[];
-    // load attachments for all homework
-    const ids = homework.map(h=>h.id);
-    if(ids.length){
-      const { data: atts } = await sb.from('homework_attachments').select('*').in('homework_id', ids);
-      hwAttachments = {};
-      (atts||[]).forEach(a => { (hwAttachments[a.homework_id]=hwAttachments[a.homework_id]||[]).push(a); });
-    }
-    // populate student dropdowns
-    const opts = students.map(s=>`<option value="${s.id}">${escape(s.display_name||s.email)}</option>`).join('') || '<option value="">No students</option>';
-    document.getElementById('hwStudent').innerHTML = opts;
-    document.getElementById('progressStudent').innerHTML = opts;
-    document.getElementById('dataStudentSel').innerHTML = opts;
-  } else {
-    // student: load attachments for their homework
-    const ids = homework.map(h=>h.id);
-    if(ids.length){
-      const { data: atts } = await sb.from('homework_attachments').select('*').in('homework_id', ids);
-      hwAttachments = {};
-      (atts||[]).forEach(a => { (hwAttachments[a.homework_id]=hwAttachments[a.homework_id]||[]).push(a); });
-    }
-  }
-  updateNotifBadge();
-}
-
-// ---------- realtime ----------
-function subscribeRealtime(){
-  if(!sb) return;
-  sb.channel('notif-channel')
-    .on('postgres_changes', { event:'INSERT', schema:'public', table:'notifications', filter:`user_id=eq.${currentUser.id}` },
-      payload => { notifications.unshift(payload.new); updateNotifBadge(); renderAll(); toast(payload.new.title); })
-    .subscribe();
-  if(isAdmin){
-    sb.channel('hw-channel')
-      .on('postgres_changes', { event:'*', schema:'public', table:'homework' },
-        async () => { await loadAll(); renderAll(); })
-      .subscribe();
-  } else {
-    sb.channel('hw-student-channel')
-      .on('postgres_changes', { event:'*', schema:'public', table:'homework', filter:`assigned_to=eq.${currentUser.id}` },
-        async () => { await loadAll(); renderAll(); toast('Homework updated'); })
-      .subscribe();
-  }
-}
-
-function updateNotifBadge(){
-  const unread = notifications.filter(n=>!n.read).length;
-  const b = document.getElementById('notifBadge');
-  if(unread>0){ b.textContent=unread; b.classList.remove('hidden'); } else { b.classList.add('hidden'); }
-}
-
-function toggleNotifPanel(){
-  const p = document.getElementById('notifPanel');
-  p.classList.toggle('show');
-  if(p.classList.contains('show')) renderNotifPanel();
-}
-function renderNotifPanel(){
-  const p = document.getElementById('notifPanel');
-  if(notifications.length===0){ p.innerHTML='<div class="empty">No notifications</div>'; return; }
-  p.innerHTML = notifications.slice(0,20).map(n=>`
-    <div class="notif-item ${n.read?'':'unread'}" onclick="markNotifRead('${n.id}','${escape(n.link||'')}')">
-      <div class="t">${escape(n.title)}</div>
-      <div class="b">${escape(n.body||'')}</div>
-      <div class="time">${new Date(n.created_at).toLocaleString()}</div>
-    </div>
-  `).join('');
-}
-async function markNotifRead(id, link){
-  await sb.from('notifications').update({read:true}).eq('id', id);
-  const n = notifications.find(x=>x.id===id); if(n) n.read=true;
-  updateNotifBadge(); renderNotifPanel();
-  if(link) { /* could navigate */ }
-}
-
-// ---------- tabs ----------
-document.querySelectorAll('nav button').forEach(b => {
-  b.addEventListener('click', () => {
-    document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    document.getElementById(b.dataset.tab).classList.add('active');
-    renderAll();
-  });
-});
-
-// ---------- assignments rendering (homework + personal) ----------
-// We treat homework as assignments in the kanban. Personal assignments are also stored as homework? 
-// To keep one source of truth, personal tasks are stored in a separate localStorage array (simple, per-device) 
-// OR as homework with assigned_to=self created_by=self. We'll use homework table with created_by=assigned_to=self for personal tasks.
-function personalHw(){ return homework.filter(h => h.created_by === currentUser.id && h.assigned_to === currentUser.id); }
-function adminHw(){ return homework.filter(h => !(h.created_by === h.assigned_to)); }
-
-function openAssignModal(){ document.getElementById('assignModal').classList.add('show'); }
-function openAssignHwModal(){
-  if(!isAdmin){ toast('Admin only'); return; }
-  pendingAttachments = [];
-  renderPendingAttachments();
-  document.getElementById('hwTitle').value=''; document.getElementById('hwDesc').value=''; document.getElementById('hwDue').value=todayStr();
-  document.getElementById('assignHwModal').classList.add('show');
-}
-function savePersonalAssignment(){
-  const hw = {
-    title: document.getElementById('aTitle').value.trim(),
-    description: document.getElementById('aNotes').value.trim(),
-    category: document.getElementById('aCat').value,
-    priority: document.getElementById('aPrio').value,
-    due_date: document.getElementById('aDue').value || null,
-    status: document.getElementById('aStatus').value,
-    assigned_to: currentUser.id,
-    created_by: currentUser.id,
-  };
-  if(!hw.title){ toast('Title required'); return; }
-  sb.from('homework').insert(hw).then(({error})=>{
-    if(error){ toast(error.message); return; }
-    closeModal('assignModal');
-    ['aTitle','aDue','aNotes'].forEach(id=>document.getElementById(id).value='');
-    loadAll().then(renderAll);
-    toast('Assignment added');
-  });
-}
-function moveAssign(id, status){
-  const patch = { status };
-  if(status==='submitted'){ patch.submitted_at = new Date().toISOString(); }
-  sb.from('homework').update(patch).eq('id', id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderAll();
-  });
-}
-function delAssign(id){
-  if(!confirm('Delete this assignment?')) return;
-  sb.from('homework').delete().eq('id', id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderAll();
-  });
-}
-function renderAssignments(){
-  const filter = document.getElementById('assignFilter').value;
-  let items = [...homework];
-  if(filter!=='all'){
-    if(['todo','doing','done'].includes(filter)) items = items.filter(h=> (h.status==='assigned'?'todo':h.status==='submitted'?'doing':'done')===filter || h.status===filter);
-    else if(filter==='homework') items = items.filter(h=> h.created_by !== h.assigned_to);
-    else items = items.filter(h=> h.category===filter);
-  }
-  const mapStatus = s => s==='assigned'?'todo' : s==='submitted'?'doing' : 'done';
-  ['todo','doing','done'].forEach(col=>{
-    const el = document.getElementById('col-'+col);
-    const colItems = items.filter(h=>mapStatus(h.status)===col);
-    if(colItems.length===0){ el.innerHTML='<div class="empty">Empty</div>'; return; }
-    el.innerHTML = colItems.map(h=>{
-      const isHw = h.created_by !== h.assigned_to;
-      const atts = hwAttachments[h.id]||[];
-      return `<div class="kcard">
-        <div class="title">${escape(h.title)} ${isHw?'<span class="pill purple">HW</span>':''}</div>
-        <div class="meta">${h.category||''} · ${h.priority||''} priority${h.due_date?' · due '+h.due_date:''}</div>
-        ${h.description?`<div class="meta">${escape(h.description).slice(0,80)}</div>`:''}
-        ${atts.length?`<div style="margin-top:4px">${atts.map(a=>`<a class="attach" href="${escape(a.url)}" target="_blank">${iconFor(a.file_type)} ${escape(a.name)}</a>`).join('')}</div>`:''}
-        ${h.grade!=null?`<div class="meta"><b>Grade: ${h.grade}/100</b>${h.feedback?' — '+escape(h.feedback).slice(0,60):''}</div>`:''}
-        <div class="row" style="margin-top:6px;gap:4px">
-          ${mapStatus(h.status)!=='todo'?'<button class="btn secondary sm" onclick="moveAssign(\''+h.id+'\',\'assigned\')">← To Do</button>':''}
-          ${mapStatus(h.status)!=='doing' && h.created_by!==h.assigned_to?'<button class="btn secondary sm" onclick="moveAssign(\''+h.id+'\',\'submitted\')">Submit</button>':''}
-          ${mapStatus(h.status)!=='done' && (isAdmin || h.created_by===h.assigned_to)?'<button class="btn secondary sm" onclick="moveAssign(\''+h.id+'\',\'graded\')">Done ✓</button>':''}
-          ${isAdmin?'<button class="btn secondary sm" onclick="openGradeModal(\''+h.id+'\')">Grade</button>':''}
-          ${(isAdmin || h.created_by===currentUser.id)?'<button class="btn danger sm" onclick="delAssign(\''+h.id+'\')">✕</button>':''}
-        </div>
-      </div>`;
-    }).join('');
-  });
-}
-
-function iconFor(t){ return {pdf:'📄',video:'🎬',doc:'📝',image:'🖼️',link:'🔗',other:'📎'}[t]||'📎'; }
-
-// ---------- study log ----------
-function addSession(){
-  const start = document.getElementById('logStart').value;
-  const end = document.getElementById('logEnd').value;
-  const hours = hoursBetween(start,end);
-  const s = { user_id: currentUser.id, date: document.getElementById('logDate').value||todayStr(), start_time:start, end_time:end, hours: hours>0?hours:0, subject: document.getElementById('logSubject').value, notes: document.getElementById('logNotes').value.trim() };
-  if(s.hours<=0){ toast('Enter valid start/end times'); return; }
-  sb.from('study_sessions').insert(s).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    document.getElementById('logStart').value=''; document.getElementById('logEnd').value=''; document.getElementById('logNotes').value='';
-    await loadAll(); renderAll(); toast('Session logged: '+s.hours+'h');
-  });
-}
-function delSession(id){
-  sb.from('study_sessions').delete().eq('id',id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderAll();
-  });
-}
-function renderSessions(){
-  const tb = document.getElementById('sessionTable');
-  const sorted = [...sessions].sort((a,b)=>(b.date||'').localeCompare(a.date||'') || (b.start_time||'').localeCompare(a.start_time||''));
-  if(sorted.length===0){ tb.innerHTML='<tr><td colspan="6" class="empty">No sessions yet</td></tr>'; return; }
-  tb.innerHTML = sorted.map(s=>`<tr>
-    <td>${s.date}</td><td>${s.start_time||'—'}–${s.end_time||'—'}</td><td>${s.hours}</td><td>${escape(s.subject)}</td><td>${escape(s.notes)}</td>
-    <td><button class="btn danger sm" onclick="delSession('${s.id}')">✕</button></td>
-  </tr>`).join('');
-}
-
-// ---------- scores ----------
-function addScore(){
-  const sc = { user_id: currentUser.id, date: document.getElementById('scoreDate').value||todayStr(), total: parseInt(document.getElementById('scoreTotal').value)||0, math: parseInt(document.getElementById('scoreMath').value)||0, rw: parseInt(document.getElementById('scoreRW').value)||0, notes: document.getElementById('scoreNotes').value.trim() };
-  if(sc.total<400){ toast('Enter total score'); return; }
-  sb.from('scores').insert(sc).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    ['scoreTotal','scoreMath','scoreRW','scoreNotes'].forEach(id=>document.getElementById(id).value='');
-    await loadAll(); renderAll(); toast('Score logged');
-  });
-}
-function delScore(id){
-  sb.from('scores').delete().eq('id',id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderAll();
-  });
-}
-function renderScores(){
-  const tb = document.getElementById('scoreTable');
-  const sorted = [...scores].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(sorted.length===0){ tb.innerHTML='<tr><td colspan="6" class="empty">No scores yet</td></tr>'; return; }
-  tb.innerHTML = sorted.map(s=>`<tr><td>${s.date}</td><td><b>${s.total}</b></td><td>${s.math}</td><td>${s.rw}</td><td>${escape(s.notes)}</td><td><button class="btn danger sm" onclick="delScore('${s.id}')">✕</button></td></tr>`).join('');
-  const asc = [...scores].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  const chart = document.getElementById('scoreChart');
-  if(asc.length===0){ chart.innerHTML=''; return; }
-  const min = Math.min(...asc.map(s=>s.total),1000); const max = Math.max(...asc.map(s=>s.total),1450); const range = max-min||1;
-  chart.innerHTML = asc.map(s=>{ const h=((s.total-min)/range)*150+10; return `<div class="bar" style="height:${h}px"><span class="val">${s.total}</span><span>${s.date.slice(5)}</span></div>`; }).join('');
-}
-
-// ---------- portfolio ----------
-function openProjModal(){ document.getElementById('projModal').classList.add('show'); }
-function saveProject(){
-  const p = { user_id: currentUser.id, name: document.getElementById('pName').value.trim(), category: document.getElementById('pCat').value, status: document.getElementById('pStatus').value, target_hours: parseFloat(document.getElementById('pTarget').value)||0, description: document.getElementById('pDesc').value.trim(), progress: 0 };
-  if(!p.name){ toast('Name required'); return; }
-  sb.from('projects').insert(p).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    closeModal('projModal');
-    ['pName','pDesc','pTarget'].forEach(id=>document.getElementById(id).value='');
-    await loadAll(); renderAll(); toast('Project added');
-  });
-}
-function delProject(id){
-  sb.from('projects').delete().eq('id',id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderAll();
-  });
-}
-function setProjStatus(id,status){ sb.from('projects').update({status}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderAll(); } }); }
-function setProjProgress(id,val){ sb.from('projects').update({progress:Math.max(0,Math.min(100,val))}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderPortfolio(); } }); }
-function addPortSession(){
-  const todayStudy = sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+s.hours,0);
-  const override = document.getElementById('portOverride').checked;
-  if(todayStudy>=3 && !override){ toast('Daily SAT study complete. Check override to log portfolio hours.'); return; }
-  const ps = { user_id: currentUser.id, date: document.getElementById('portDate').value||todayStr(), hours: parseFloat(document.getElementById('portHours').value)||0, project: document.getElementById('portProject').value, notes: document.getElementById('portNotes').value.trim() };
-  if(ps.hours<=0){ toast('Enter hours'); return; }
-  sb.from('port_sessions').insert(ps).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    document.getElementById('portHours').value=''; document.getElementById('portNotes').value=''; document.getElementById('portOverride').checked=false;
-    await loadAll(); renderAll(); toast('Portfolio hours logged');
-  });
-}
-function delPort(id){
-  sb.from('port_sessions').delete().eq('id',id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderAll();
-  });
-}
-function renderPortfolio(){
-  const todayStudy = sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+s.hours,0);
-  const unlocked = todayStudy < 3; // portfolio allowed when study not complete OR override; lock only if study complete? We keep original: log allowed anytime with override; show status.
-  // Actually keep simple: always show; status banner indicates.
-  const ws = weekStart();
-  const weekPort = portSessions.filter(s=>s.date>=ws).reduce((a,s)=>a+s.hours,0);
-  const totalPort = portSessions.reduce((a,s)=>a+s.hours,0);
-  document.getElementById('portStats').innerHTML = `
-    <div class="stat-box"><div class="v">${projects.length}</div><div class="l">Projects</div></div>
-    <div class="stat-box"><div class="v">${weekPort.toFixed(1)}</div><div class="l">This week (h)</div></div>
-    <div class="stat-box"><div class="v">${totalPort.toFixed(1)}</div><div class="l">Total hours</div></div>
-    <div class="stat-box"><div class="v">${Math.max(0,5-weekPort).toFixed(1)}</div><div class="l">Remaining (h)</div></div>`;
-  const statusEl = document.getElementById('portStudyStatus');
-  if(todayStudy>=3) statusEl.innerHTML = `<span class="pill good">Daily SAT study complete: ${todayStudy.toFixed(1)}h / 3h</span> — portfolio hours are extra. Check override to log.`;
-  else statusEl.innerHTML = `<span class="pill warn">Daily SAT study: ${todayStudy.toFixed(1)}h / 3h</span> — portfolio hours allowed.`;
-  const list = document.getElementById('projList');
-  if(projects.length===0) list.innerHTML='<div class="empty">No projects yet. Add one to start tracking.</div>';
-  else list.innerHTML = projects.map(p=>{
-    const projHours = portSessions.filter(s=>s.project===p.name).reduce((a,s)=>a+s.hours,0);
-    return `<div class="proj-card"><div class="head"><div><div class="name">${escape(p.name)} <span class="pill info">${p.category||''}</span></div><div class="meta">${escape(p.description||'No description')} · Target ${p.target_hours||0}h/week</div></div>
-      <div class="row" style="gap:4px"><select onchange="setProjStatus('${p.id}',this.value)" style="width:auto;padding:4px 6px;font-size:11px">${['Planning','In Progress','Completed'].map(st=>`<option ${p.status===st?'selected':''}>${st}</option>`).join('')}</select>
-      <button class="btn danger sm" onclick="delProject('${p.id}')">✕</button></div></div>
-      <div class="meta">Hours logged: <b>${projHours.toFixed(1)}h</b> · Status: <b>${p.status}</b></div>
-      <div class="row" style="gap:8px;margin-top:6px"><label style="margin:0;white-space:nowrap">Progress %</label><input type="number" min="0" max="100" value="${p.progress||0}" style="width:70px" onchange="setProjProgress('${p.id}',parseInt(this.value)||0)">
-      <div class="progress" style="flex:1"><div style="width:${p.progress||0}%"></div></div><span style="font-size:12px;font-weight:600">${p.progress||0}%</span></div></div>`;
-  }).join('');
-  const sel = document.getElementById('portProject');
-  sel.innerHTML = projects.length ? projects.map(p=>`<option>${escape(p.name)}</option>`).join('') : '<option>No projects</option>';
-  const tb = document.getElementById('portTable');
-  const sorted = [...portSessions].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(sorted.length===0){ tb.innerHTML='<tr><td colspan="5" class="empty">No sessions</td></tr>'; return; }
-  tb.innerHTML = sorted.map(s=>`<tr><td>${s.date}</td><td>${s.hours}</td><td>${escape(s.project)}</td><td>${escape(s.notes)}</td><td><button class="btn danger sm" onclick="delPort('${s.id}')">✕</button></td></tr>`).join('');
-}
-
-// ---------- goals ----------
-let goalView='list';
-function setGoalView(v){ goalView=v; document.getElementById('goalListBtn').classList.toggle('active',v==='list'); document.getElementById('goalCalBtn').classList.toggle('active',v==='calendar'); renderGoals(); }
-function openGoalModal(){ document.getElementById('goalModal').classList.add('show'); }
-function saveGoal(){
-  const g = { user_id: currentUser.id, text: document.getElementById('gText').value.trim(), due_date: document.getElementById('gDate').value||null, priority: document.getElementById('gPrio').value, done:false };
-  if(!g.text){ toast('Goal required'); return; }
-  sb.from('goals').insert(g).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    closeModal('goalModal'); document.getElementById('gText').value=''; document.getElementById('gDate').value='';
-    await loadAll(); renderAll(); toast('Goal added');
-  });
-}
-function toggleGoal(i){
-  const g = goals[i];
-  sb.from('goals').update({done:!g.done}).eq('id',g.id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderGoals();
-  });
-}
-function delGoal(i){
-  const g = goals[i];
-  sb.from('goals').delete().eq('id',g.id).then(async ({error})=>{
-    if(error){ toast(error.message); return; }
-    await loadAll(); renderAll();
-  });
-}
-function renderGoals(){
-  const listEl=document.getElementById('goalsList'); const calEl=document.getElementById('goalsCalendar');
-  if(goalView==='list'){
-    listEl.style.display='block'; calEl.style.display='none';
-    const sorted=[...goals].sort((a,b)=>(a.due_date||'9999').localeCompare(b.due_date||'9999'));
-    if(sorted.length===0){ listEl.innerHTML='<div class="empty">No goals yet</div>'; return; }
-    listEl.innerHTML = sorted.map(g=>{
-      const realIdx = goals.indexOf(g);
-      const overdue = g.due_date && !g.done && g.due_date < todayStr();
-      return `<div class="list"><li><label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1"><input type="checkbox" class="checkbox" ${g.done?'checked':''} onchange="toggleGoal(${realIdx})"><span style="${g.done?'text-decoration:line-through;color:var(--muted)':''}">${escape(g.text)}</span></label>
-      <div class="row" style="gap:6px">${g.due_date?`<span class="pill ${overdue?'bad':g.done?'good':'info'}">${g.due_date}</span>`:'<span class="pill gray">no date</span>'}<span class="pill ${g.priority==='high'?'bad':g.priority==='med'?'warn':'good'}">${g.priority}</span><button class="btn danger sm" onclick="delGoal(${realIdx})">✕</button></div></li></div>`;
-    }).join('');
-  } else {
-    listEl.style.display='none'; calEl.style.display='block';
-    const now=new Date(); const y=now.getFullYear(), m=now.getMonth();
-    const first=new Date(y,m,1); const last=new Date(y,m+1,0); const startDay=first.getDay(); const daysInMonth=last.getDate();
-    const monthName=first.toLocaleString('default',{month:'long',year:'numeric'});
-    let html=`<h3 style="text-transform:none;letter-spacing:0;color:var(--text);font-size:15px;margin-bottom:8px">${monthName}</h3><div class="cal-grid">`;
-    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{ html+=`<div style="text-align:center;font-size:10px;color:var(--muted);font-weight:700;padding:4px">${d}</div>`; });
-    for(let i=0;i<startDay;i++) html+=`<div class="cal-cell"></div>`;
-    for(let d=1;d<=daysInMonth;d++){
-      const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const dayGoals=goals.filter(g=>g.due_date===ds);
-      html+=`<div class="cal-cell ${dayGoals.length?'has':''}"><div class="d">${d}</div>${dayGoals.map(g=>`<div class="goal">${escape(g.text.slice(0,22))}</div>`).join('')}</div>`;
-    }
-    html+='</div>'; calEl.innerHTML=html;
-  }
-}
-
-// ---------- admin ----------
-let adminView='grade';
-function setAdminView(v){
-  adminView=v;
-  ['assign','grade','progress','data'].forEach(x=>{
-    document.getElementById('admin'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('hidden', x!==v);
-    const btn = document.getElementById('admin'+x.charAt(0).toUpperCase()+x.slice(1)+'Btn');
-    if(btn) btn.classList.toggle('active', x===v);
-  });
-  if(v==='grade') renderGradeQueue();
-  if(v==='progress') renderProgress();
-  if(v==='data') loadDataControl();
-}
-
-// attachments for assign form
-function addAttachment(){
-  const name = document.getElementById('attName').value.trim();
-  const url = document.getElementById('attUrl').value.trim();
-  const type = document.getElementById('attType').value;
-  if(!name||!url){ toast('Name and URL required'); return; }
-  pendingAttachments.push({name,url,file_type:type});
-  document.getElementById('attName').value=''; document.getElementById('attUrl').value='';
-  renderPendingAttachments();
-}
-async function uploadAttachment(){
-  const f = document.getElementById('attFile').files[0];
-  if(!f) return;
-  const path = `${currentUser.id}/${Date.now()}_${f.name}`;
-  const { error } = await sb.storage.from('homework-files').upload(path, f);
-  if(error){ toast(error.message); return; }
-  const { data } = sb.storage.from('homework-files').getPublicUrl(path);
-  pendingAttachments.push({ name: f.name, url: data.publicUrl, file_type: guessType(f.name), storage_path: path });
-  document.getElementById('attFile').value='';
-  renderPendingAttachments();
-  toast('File uploaded');
-}
-function guessType(name){ const e=name.split('.').pop().toLowerCase(); if(e==='pdf') return 'pdf'; if(['png','jpg','jpeg','gif','webp'].includes(e)) return 'image'; if(['mp4','mov','webm'].includes(e)) return 'video'; if(['doc','docx','txt','md'].includes(e)) return 'doc'; return 'other'; }
-function renderPendingAttachments(){
-  const el = document.getElementById('attachList');
-  if(pendingAttachments.length===0){ el.innerHTML='<div class="muted" style="font-size:12px">No attachments yet.</div>'; return; }
-  el.innerHTML = pendingAttachments.map((a,i)=>`<div class="row" style="margin-bottom:4px"><span class="attach">${iconFor(a.file_type)} ${escape(a.name)}</span><button class="btn danger sm" onclick="removeAttachment(${i})">✕</button></div>`).join('');
-}
-function removeAttachment(i){ pendingAttachments.splice(i,1); renderPendingAttachments(); }
-
-async function assignHomework(){
-  const title = document.getElementById('hwTitle').value.trim();
-  const desc = document.getElementById('hwDesc').value.trim();
-  const cat = document.getElementById('hwCat').value;
-  const prio = document.getElementById('hwPrio').value;
-  const due = document.getElementById('hwDue').value || null;
-  const studentId = document.getElementById('hwStudent').value;
-  if(!title){ toast('Title required'); return; }
-  if(!studentId){ toast('Select a student'); return; }
-  const { data: hw, error } = await sb.from('homework').insert({
-    title, description: desc, category: cat, priority: prio, due_date: due,
-    assigned_to: studentId, created_by: currentUser.id, status: 'assigned'
-  }).select().single();
-  if(error){ toast(error.message); return; }
-  // attachments
-  if(pendingAttachments.length){
-    const rows = pendingAttachments.map(a=>({ homework_id: hw.id, name: a.name, url: a.url, file_type: a.file_type, storage_path: a.storage_path||null }));
-    await sb.from('homework_attachments').insert(rows);
-  }
-  // notification
-  await sb.from('notifications').insert({
-    user_id: studentId, type: 'homework_assigned',
-    title: 'New homework assigned',
-    body: title + (due? ' · due '+due : ''),
-    link: 'assignments'
-  });
-  pendingAttachments = [];
-  renderPendingAttachments();
-  document.getElementById('hwTitle').value=''; document.getElementById('hwDesc').value=''; document.getElementById('hwDue').value='';
-  toast('Homework assigned');
-  await loadAll(); renderAll();
-}
-
-// grading
-let currentGradeHwId = null;
-function openGradeModal(id){
-  currentGradeHwId = id;
-  const h = homework.find(x=>x.id===id);
-  document.getElementById('gradeHwInfo').innerHTML = `<b>${escape(h.title)}</b><div class="muted" style="font-size:12px">${escape(h.description||'')}</div>`;
-  document.getElementById('gradeVal').value = h.grade!=null?h.grade:'';
-  document.getElementById('gradeFeedback').value = h.feedback||'';
-  document.getElementById('gradeModal').classList.add('show');
-}
-async function submitGrade(){
-  const g = parseFloat(document.getElementById('gradeVal').value);
-  const fb = document.getElementById('gradeFeedback').value.trim();
-  const h = homework.find(x=>x.id===currentGradeHwId);
-  const { error } = await sb.from('homework').update({
-    grade: isNaN(g)?null:g, feedback: fb||null, status: 'graded',
-    graded_at: new Date().toISOString(), graded_by: currentUser.id
-  }).eq('id', currentGradeHwId);
-  if(error){ toast(error.message); return; }
-  await sb.from('notifications').insert({
-    user_id: h.assigned_to, type: 'homework_graded',
-    title: 'Homework graded: '+h.title,
-    body: (isNaN(g)?'':('Grade: '+g+'/100. ')) + (fb?fb.slice(0,80):''),
-    link: 'assignments'
-  });
-  closeModal('gradeModal');
-  await loadAll(); renderAll(); toast('Grade saved');
-}
-function renderGradeQueue(){
-  const el = document.getElementById('gradeQueue');
-  const q = homework.filter(h => h.status==='submitted' || h.status==='assigned').sort((a,b)=>(a.due_date||'9999').localeCompare(b.due_date||'9999'));
-  if(q.length===0){ el.innerHTML='<div class="empty">Nothing to grade.</div>'; return; }
-  el.innerHTML = q.map(h=>{
-    const atts = hwAttachments[h.id]||[];
-    const student = students.find(s=>s.id===h.assigned_to);
-    return `<div class="hw-card">
-      <div class="title">${escape(h.title)} <span class="pill ${h.status==='submitted'?'warn':'info'}">${h.status}</span></div>
-      <div class="meta">${escape(student?.display_name||'student')} · ${h.category} · priority ${h.priority}${h.due_date?' · due '+h.due_date:''}</div>
-      ${h.description?`<div style="font-size:13px;margin:6px 0">${escape(h.description)}</div>`:''}
-      ${h.submission_note?`<div class="meta"><b>Submission note:</b> ${escape(h.submission_note)}</div>`:''}
-      ${atts.length?`<div style="margin:6px 0">${atts.map(a=>`<a class="attach" href="${escape(a.url)}" target="_blank">${iconFor(a.file_type)} ${escape(a.name)}</a>`).join('')}</div>`:''}
-      ${h.grade!=null?`<div class="meta"><b>Grade: ${h.grade}/100</b> ${h.feedback?'— '+escape(h.feedback):''}</div>`:''}
-      <div class="row" style="margin-top:8px;gap:6px">
-        <button class="btn sm" onclick="openGradeModal('${h.id}')">Grade / Feedback</button>
-        <button class="btn secondary sm" onclick="openHwDetail('${h.id}')">View</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function openHwDetail(id){
-  const h = homework.find(x=>x.id===id);
-  const atts = hwAttachments[h.id]||[];
-  const student = students.find(s=>s.id===h.assigned_to);
-  document.getElementById('hwDetailTitle').textContent = h.title;
-  document.getElementById('hwDetailBody').innerHTML = `
-    <div class="meta">${escape(student?.display_name||'student')} · ${h.category} · ${h.priority} · due ${h.due_date||'—'}</div>
-    <div style="margin:8px 0;font-size:13px">${escape(h.description||'')}</div>
-    ${atts.length?`<div>${atts.map(a=>`<a class="attach" href="${escape(a.url)}" target="_blank">${iconFor(a.file_type)} ${escape(a.name)}</a>`).join('')}</div>`:''}
-    ${h.grade!=null?`<div class="grade-box"><b>Grade: ${h.grade}/100</b><div style="font-size:13px;margin-top:4px">${escape(h.feedback||'')}</div></div>`:''}
-    ${h.submission_note?`<div class="grade-box"><b>Student note:</b> ${escape(h.submission_note)}</div>`:''}`;
-  document.getElementById('hwDetailModal').classList.add('show');
-}
-
-// progress dashboard
-async function renderProgress(){
-  const sid = document.getElementById('progressStudent').value;
-  if(!sid) return;
-  // fetch student data
-  const [ss, sc, hw] = await Promise.all([
-    sb.from('study_sessions').select('*').eq('user_id', sid),
-    sb.from('scores').select('*').eq('user_id', sid),
-    sb.from('homework').select('*').eq('assigned_to', sid),
-  ]);
-  const sessionsD = ss.data||[]; const scoresD = sc.data||[]; const hwD = hw.data||[];
-  const weekH = sessionsD.filter(s=>s.date>=weekStart()).reduce((a,s)=>a+s.hours,0);
-  const totalH = sessionsD.reduce((a,s)=>a+s.hours,0);
-  const doneHw = hwD.filter(h=>h.status==='graded'||h.status==='submitted').length;
-  const avgGrade = hwD.filter(h=>h.grade!=null).reduce((a,h,i,arr)=>a+h.grade/arr.length,0) || 0;
-  const latestScore = scoresD.length ? [...scoresD].sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0].total : '—';
-  document.getElementById('progressStats').innerHTML = `
-    <div class="stat-box"><div class="v">${latestScore}</div><div class="l">Latest score</div></div>
-    <div class="stat-box"><div class="v">${weekH.toFixed(1)}</div><div class="l">Study hrs this wk</div></div>
-    <div class="stat-box"><div class="v">${totalH.toFixed(1)}</div><div class="l">Total study hrs</div></div>
-    <div class="stat-box"><div class="v">${doneHw}/${hwD.length}</div><div class="l">HW done</div></div>
-    <div class="stat-box"><div class="v">${avgGrade?avgGrade.toFixed(0):'—'}</div><div class="l">Avg grade</div></div>`;
-  // score chart
-  const asc = [...scoresD].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  const scoreChartEl = document.getElementById('progressScoreChart');
-  if(asc.length===0) scoreChartEl.innerHTML='<div class="empty">No scores yet</div>';
-  else { const min=Math.min(...asc.map(s=>s.total),1000); const max=Math.max(...asc.map(s=>s.total),1450); const range=max-min||1; scoreChartEl.innerHTML=asc.map(s=>{const h=((s.total-min)/range)*140+10;return `<div class="bar" style="height:${h}px"><span class="val">${s.total}</span><span>${s.date.slice(5)}</span></div>`;}).join(''); }
-  // study chart 14 days
-  const days=[]; for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
-  const stc=document.getElementById('progressStudyChart');
-  const maxH=Math.max(1,...days.map(d=>sessionsD.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0)));
-  stc.innerHTML=days.map(d=>{const h=sessionsD.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0);const height=(h/maxH)*140;return `<div class="bar" style="height:${Math.max(4,height)}px"><span class="val">${h?h.toFixed(1):''}</span><span>${d.slice(5)}</span></div>`;}).join('');
-  // homework status
-  const hwEl=document.getElementById('progressHw');
-  if(hwD.length===0) hwEl.innerHTML='<div class="empty">No homework assigned.</div>';
-  else hwEl.innerHTML = hwD.map(h=>`<div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-    <span>${escape(h.title)}</span>
-    <span class="pill ${h.status==='graded'?'good':h.status==='submitted'?'warn':'info'}">${h.status}${h.grade!=null?' · '+h.grade+'/100':''}</span>
-  </div>`).join('');
-  // recent activity
-  const act = document.getElementById('progressActivity');
-  const acts = [
-    ...sessionsD.slice(0,5).map(s=>({t:s.created_at, txt:`Studied ${s.hours}h — ${s.subject}`, pill:'info'})),
-    ...scoresD.slice(0,3).map(s=>({t:s.created_at, txt:`Practice test: ${s.total}`, pill:'good'})),
-  ].sort((a,b)=>(b.t||'').localeCompare(a.t||'')).slice(0,8);
-  act.innerHTML = acts.length ? acts.map(a=>`<li><span>${escape(a.txt)}</span><span class="pill ${a.pill}">${(a.t||'').slice(0,10)}</span></li>`).join('') : '<li class="empty">No activity yet</li>';
-}
-
-// data control
-async function loadDataControl(){
-  const table = document.getElementById('dataTabSel').value;
-  const sid = document.getElementById('dataStudentSel').value;
-  if(!sid) return;
-  const { data } = await sb.from(table).select('*').eq('user_id', sid).order('created_at',{ascending:false});
-  const rows = data||[];
-  const head = document.getElementById('dataHead');
-  const body = document.getElementById('dataTable');
-  if(rows.length===0){ head.innerHTML=''; body.innerHTML='<tr><td class="empty">No rows</td></tr>'; return; }
-  const cols = Object.keys(rows[0]).filter(c=>!['user_id'].includes(c));
-  head.innerHTML = `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}<th></th></tr>`;
-  body.innerHTML = rows.map(r=>`<tr>${cols.map(c=>`<td>${escape(String(r[c]??''))}</td>`).join('')}<td><button class="btn danger sm" onclick="deleteRow('${table}','${r.id}')">✕</button></td></tr>`).join('');
-}
-async function deleteRow(table,id){
-  if(!confirm('Delete this row?')) return;
-  await sb.from(table).delete().eq('id',id);
-  toast('Deleted');
-  loadDataControl();
-}
-
-// ---------- dashboard ----------
-function renderDashboard(){
-  const now = new Date();
-  const TEST_DATE = new Date('2026-12-05');
-  const diff = Math.ceil((TEST_DATE-now)/(1000*60*60*24));
-  document.getElementById('daysLeft') && (document.getElementById('daysLeft').textContent = diff>0?diff:0);
-  document.getElementById('countdownText').textContent = diff>0 ? `${diff} days until test day` : 'Test day!';
-  const latest = scores.length ? [...scores].sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0].total : 1200;
-  document.getElementById('currentScore').textContent = latest;
-  const pct = Math.min(100, Math.max(0, (latest-1200)/(1450-1200)*100));
-  document.getElementById('scoreBar').style.width = pct+'%';
-  document.getElementById('scorePct').textContent = Math.round(pct)+'% of the way to 1450';
-  const today = todayStr();
-  const todayH = sessions.filter(s=>s.date===today).reduce((a,s)=>a+s.hours,0);
-  document.getElementById('todayHours').textContent = todayH.toFixed(2).replace(/\.00$/,'');
-  document.getElementById('todayBar').style.width = Math.min(100, todayH/4*100)+'%';
-  document.getElementById('todayStatus').textContent = todayH>=3 ? 'Daily promise met ✓' : `${(3-todayH).toFixed(1)}h remaining`;
-  const ws = weekStart();
-  const weekH = sessions.filter(s=>s.date>=ws).reduce((a,s)=>a+s.hours,0);
-  document.getElementById('weekHours').textContent = weekH.toFixed(1);
-  document.getElementById('weekBar').style.width = Math.min(100, weekH/25*100)+'%';
-  const portWeek = portSessions.filter(s=>s.date>=ws).reduce((a,s)=>a+s.hours,0);
-  document.getElementById('portWeek').textContent = portWeek.toFixed(1);
-  const total = homework.length;
-  const done = homework.filter(h=>h.status==='graded'||h.status==='submitted').length;
-  document.getElementById('assignTotal').textContent = total;
-  document.getElementById('assignDone').textContent = done;
-  document.getElementById('assignBar').style.width = (total?done/total*100:0)+'%';
-  document.getElementById('assignStatus').textContent = total ? `${done} of ${total} complete` : 'No assignments yet';
-  const recent = document.getElementById('recentSessions');
-  const rs = [...sessions].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5);
-  recent.innerHTML = rs.length ? rs.map(s=>`<li><span>${s.date} · ${escape(s.subject)}${s.start_time?' ('+s.start_time+'–'+s.end_time+')':''}</span><span class="pill info">${s.hours}h</span></li>`).join('') : '<li class="empty">No sessions yet</li>';
-  const up = document.getElementById('upcomingAssign');
-  const ua = homework.filter(h=>h.status!=='graded').sort((a,b)=>(a.due_date||'9999').localeCompare(b.due_date||'9999')).slice(0,5);
-  up.innerHTML = ua.length ? ua.map(h=>`<li><span>${escape(h.title)}</span><span class="pill ${h.priority==='high'?'bad':h.priority==='med'?'warn':'good'}">${h.due_date||'no due'}</span></li>`).join('') : '<li class="empty">No pending homework</li>';
-  const chart = document.getElementById('weekChart');
-  const days=[]; for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
-  const maxH = Math.max(1, ...days.map(d=>sessions.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0)));
-  chart.innerHTML = days.map(d=>{const h=sessions.filter(s=>s.date===d).reduce((a,s)=>a+s.hours,0);const height=(h/maxH)*150;return `<div class="bar" style="height:${Math.max(4,height)}px"><span class="val">${h?h.toFixed(1):''}</span><span>${d.slice(5)}</span></div>`;}).join('');
-}
-
-function renderDayPlan(){
-  const tb = document.getElementById('dayPlanTable');
-  if(!tb) return;
-  tb.innerHTML = DAY_PLAN.map(e=>{
-    const isToday = e.d === todayStr();
-    const past = e.d < todayStr();
-    return `<tr style="${isToday?'background:#eef2ff;font-weight:600':''}${past?'opacity:.7':''}">
-      <td>${e.d}<br><span style="font-size:10px;color:var(--muted)">${new Date(e.d).toLocaleDateString('en-US',{weekday:'short'})}</span></td>
-      <td><span class="pill ${e.ph==='TEST DAY'?'warn':'info'}">${e.ph}</span></td>
-      <td style="font-size:12px">${e.sat}</td>
-      <td style="font-size:12px">${e.port}</td>
-      <td style="font-size:12px">${e.chk}</td>
-    </tr>`;
-  }).join('');
-}
-
-function renderAll(){
-  renderDashboard();
-  renderAssignments();
-  renderSessions();
-  renderScores();
-  renderPortfolio();
-  renderGoals();
-  renderDayPlan();
-  if(isAdmin && document.getElementById('admin').classList.contains('active')){
-    if(adminView==='grade') renderGradeQueue();
-    if(adminView==='progress') renderProgress();
-  }
-}
-
-// ---------- init wiring ----------
-document.getElementById('logDate').value = todayStr();
-document.getElementById('scoreDate').value = todayStr();
-document.getElementById('portDate').value = todayStr();
-document.getElementById('gDate').value = todayStr();
-document.getElementById('hwDue').value = todayStr();
-renderPendingAttachments();
-
-init();
-</script>
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/render.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

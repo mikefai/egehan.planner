@@ -1,0 +1,54 @@
+/* ============================================================
+   Design tokens — the one source of color/type/space truth.
+   Contrast-checked: text colors are >= 4.5:1 on their surface.
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --canvas: #f3f6fc;
+  --surface: #ffffff;
+  --surface-2: #edf1f9;
+  --surface-3: #e1e8f4;
+
+  /* Ink (text) */
+  --ink: #10131e;        /* primary — 15:1 on white */
+  --ink-2: #363e54;      /* secondary — 8.9:1 */
+  --muted: #566078;      /* tertiary — 5.2:1 on white, 4.5:1 on surface-2 */
+
+  /* Lines */
+  --line: #d3dbee;
+  --line-strong: #b9c4dd;
+
+  /* Semantic */
+  --primary: #2b4fd0;    /* 6.3:1 white text on it */
+  --primary-hover: #203eb0;
+  --primary-soft: #e7ecfb;
+  --violet: #6d28d9;
+  --violet-soft: #efe6fb;
+  --success: #0b7a54;
+  --success-soft: #dcf2ea;
+  --warn: #985200;
+  --warn-soft: #f7ecd9;
+  --danger: #bf2434;
+  --danger-soft: #f9e2e5;
+
+  /* Depth */
+  --shadow-sm: 0 1px 2px rgba(16,19,30,.06), 0 1px 3px rgba(16,19,30,.05);
+  --shadow-md: 0 4px 16px rgba(16,19,30,.08), 0 2px 6px rgba(16,19,30,.05);
+  --shadow-lg: 0 24px 64px rgba(16,19,30,.20);
+
+  /* Radii — a deliberate scale, not one value everywhere */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+
+  /* Space scale */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 22px; --s-6: 30px; --s-7: 42px;
+
+  /* Type */
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+
+  --nav-w: 244px;
+}

@@ -1,0 +1,19 @@
+{
+  "weekly": [
+    {"day":"Mon","study":"Math Algebra 1.5h + R&W grammar 1.5h","port":"0.7h AI project","checkpoint":"Review weekend errors"},
+    {"day":"Tue","study":"Reading evidence 2h + Math data analysis 1.5h","port":"0.7h AI project","checkpoint":"Vocab 15 words"},
+    {"day":"Wed","study":"Writing expression 1.5h + Math advanced 1.5h","port":"0.7h portfolio polish","checkpoint":"Mini quiz"},
+    {"day":"Thu","study":"Math geometry/trig 2h + R&W 1.5h","port":"0.7h AI project","checkpoint":"Weak topics review"},
+    {"day":"Fri","study":"Practice section 2h + error log 1.5h","port":"0.7h self-dev reading","checkpoint":"Track accuracy"},
+    {"day":"Sat","study":"Full practice test 3h + review 1h","port":"—","checkpoint":"Weekly assessment"},
+    {"day":"Sun","study":"Targeted drills 2h + timing 1h","port":"2h portfolio","checkpoint":"Plan next week"}
+  ],
+  "milestones": [
+    {"label":"Wk1 (Nov 4-10)","desc":"Baseline diagnostic, identify weak areas","target":"1200→1260","tone":"info"},
+    {"label":"Wk2 (Nov 11-17)","desc":"Targeted skill building, 2 practice tests","target":"1260→1320","tone":"info"},
+    {"label":"Wk3 (Nov 18-24)","desc":"Integration, timing, error-log mastery","target":"1320→1390","tone":"info"},
+    {"label":"Wk4 (Nov 25-Dec 1)","desc":"Polish, stamina, finalize portfolio","target":"1390→1440+","tone":"info"},
+    {"label":"Dec 2-4","desc":"Taper, rest, test-day prep","target":"Ready","tone":"good"},
+    {"label":"Dec 5","desc":"SAT Test Day 🎯","target":"Test","tone":"warn"}
+  ]
+}

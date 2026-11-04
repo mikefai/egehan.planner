@@ -1,0 +1,136 @@
+/* Components — every class the JS/HTML uses, restyled for contrast.
+   Class names are preserved so existing render functions keep working. */
+
+/* ---- Card / surface ---- */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-4); box-shadow: var(--shadow-sm); }
+.card h2 { font-size: 16px; margin-bottom: var(--s-3); }
+.card h3 { font-size: 12px; margin: var(--s-4) 0 var(--s-2); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; font-family: var(--font-body); }
+.panel { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-4); }
+
+/* ---- Buttons ---- */
+.btn { background: var(--primary); color: #fff; border: none; padding: 9px 15px; border-radius: var(--r-sm); cursor: pointer; font-size: 13px; font-weight: 600; transition: background .12s, transform .06s; }
+.btn:hover { background: var(--primary-hover); }
+.btn:active { transform: translateY(1px); }
+.btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); }
+.btn.secondary:hover { background: var(--surface-2); }
+.btn.danger { background: var(--danger); }
+.btn.danger:hover { background: #9c1e2c; }
+.btn.ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+.btn.sm { padding: 5px 10px; font-size: 12px; }
+
+/* ---- Pills / badges ---- */
+.pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.pill.good { background: var(--success-soft); color: var(--success); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--danger-soft); color: var(--danger); }
+.pill.info { background: var(--primary-soft); color: var(--primary); }
+.pill.purple { background: var(--violet-soft); color: var(--violet); }
+.pill.gray { background: var(--surface-3); color: var(--ink-2); }
+
+/* ---- Stat tiles ---- */
+.big { font-size: 34px; font-weight: 800; font-family: var(--font-display); line-height: 1; color: var(--ink); }
+.stat-row { display: flex; gap: var(--s-3); flex-wrap: wrap; margin-bottom: var(--s-3); }
+.stat-box { flex: 1; min-width: 110px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-4); text-align: center; }
+.stat-box .v { font-size: 22px; font-weight: 800; color: var(--primary); font-family: var(--font-display); line-height: 1.1; }
+.stat-box .l { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 3px; }
+
+/* ---- Progress ---- */
+.progress { height: 8px; background: var(--surface-3); border-radius: 999px; overflow: hidden; }
+.progress > div { height: 100%; background: linear-gradient(90deg, var(--primary), var(--violet)); transition: width .3s; }
+
+/* ---- Rows & lists ---- */
+.row { display: flex; gap: var(--s-2); align-items: center; flex-wrap: wrap; }
+.list { list-style: none; }
+.list li { padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.list li:last-child { border-bottom: none; }
+.empty { color: var(--muted); text-align: center; padding: 26px; font-size: 14px; }
+
+/* ---- Toggle buttons ---- */
+.toggle-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.toggle-btn { padding: 7px 13px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--surface); cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.toggle-btn:hover { background: var(--surface-2); }
+.toggle-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* ---- Tables ---- */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px 11px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: .04em; background: var(--surface-2); }
+tbody tr:hover td { background: var(--surface-2); }
+.checkbox { width: 17px; height: 17px; cursor: pointer; accent-color: var(--primary); }
+
+/* ---- Kanban ---- */
+.kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); }
+@media (max-width: 900px) { .kanban { grid-template-columns: 1fr; } }
+.kanban-col { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-3); min-height: 170px; }
+.kanban-col h4 { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: var(--s-2); letter-spacing: .05em; font-weight: 700; }
+.kcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 11px; margin-bottom: 8px; font-size: 13px; box-shadow: var(--shadow-sm); }
+.kcard .title { font-weight: 700; color: var(--ink); }
+.kcard .meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+/* ---- Resource list ---- */
+.resource { border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-4); margin-bottom: var(--s-3); background: var(--surface-2); }
+.resource .title { font-weight: 700; color: var(--primary); margin-bottom: 3px; font-size: 15px; }
+.resource .meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.resource .desc { font-size: 13.5px; color: var(--ink-2); }
+
+/* ---- Hero / mission ---- */
+.hero { background: linear-gradient(135deg, var(--primary-soft), var(--violet-soft)); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-5); margin-bottom: var(--s-4); }
+.hero h2 { color: var(--ink); font-size: 22px; }
+.countdown { font-size: 28px; font-weight: 800; color: var(--primary); font-family: var(--font-display); margin-top: 4px; }
+
+/* ---- Charts (bars) ---- */
+.chart { height: 160px; display: flex; align-items: flex-end; gap: 5px; padding: 16px 0 22px; }
+.bar { flex: 1; background: linear-gradient(180deg, var(--primary), var(--violet)); border-radius: 4px 4px 0 0; min-height: 4px; position: relative; }
+.bar span { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--muted); white-space: nowrap; }
+.bar .val { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--ink); font-weight: 700; }
+
+/* ---- Attachments ---- */
+.attach { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--line-strong); font-size: 12.5px; margin: 3px; text-decoration: none; color: var(--primary); font-weight: 600; }
+.attach:hover { background: var(--primary-soft); }
+
+/* ---- Homework / grading cards ---- */
+.hw-card { border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-4); margin-bottom: var(--s-3); background: var(--surface-2); }
+.hw-card .title { font-weight: 700; font-size: 15px; color: var(--ink); }
+.hw-card .meta { font-size: 12px; color: var(--muted); margin: 5px 0; }
+.hw-card .due-soon { border-left: 4px solid var(--warn); padding-left: 12px; }
+.grade-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: var(--s-3); margin-top: var(--s-2); }
+
+/* ---- Project cards ---- */
+.proj-card { border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-4); margin-bottom: var(--s-3); background: var(--surface-2); }
+.proj-card .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.proj-card .name { font-weight: 700; font-size: 15px; color: var(--ink); }
+.proj-card .meta { font-size: 12px; color: var(--muted); margin: 4px 0; }
+
+/* ---- Calendar (goals) ---- */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-cell { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 6px 4px; min-height: 56px; font-size: 11px; background: var(--surface); }
+.cal-cell .d { font-weight: 700; color: var(--muted); }
+.cal-cell.has { background: var(--primary-soft); border-color: var(--primary); }
+.cal-cell .goal { font-size: 10px; color: var(--primary); margin-top: 2px; font-weight: 600; }
+
+/* ---- Modals ---- */
+.modal-back { position: fixed; inset: 0; background: rgba(16,19,30,.55); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(3px); padding: 16px; }
+.modal-back.show { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-6); width: 100%; max-width: 560px; max-height: 90vh; overflow: auto; box-shadow: var(--shadow-lg); }
+.modal h2 { margin-bottom: var(--s-4); font-size: 19px; }
+.close { float: right; cursor: pointer; color: var(--muted); font-size: 24px; line-height: 1; }
+.close:hover { color: var(--ink); }
+
+/* ---- Toast ---- */
+.toast { position: fixed; bottom: 22px; right: 22px; background: var(--success); color: #fff; padding: 12px 18px; border-radius: var(--r-md); font-size: 14px; font-weight: 600; display: none; z-index: 100; box-shadow: var(--shadow-md); }
+.toast.show { display: block; }
+
+/* ---- Notifications ---- */
+.notif-panel { position: fixed; top: 64px; right: 16px; width: 360px; max-height: 440px; overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-lg); z-index: 60; display: none; }
+.notif-panel.show { display: block; }
+.notif-item { padding: var(--s-4); border-bottom: 1px solid var(--line); cursor: pointer; }
+.notif-item:hover { background: var(--surface-2); }
+.notif-item.unread { background: var(--primary-soft); }
+.notif-item .t { font-weight: 700; font-size: 14px; color: var(--ink); }
+.notif-item .b { font-size: 13px; color: var(--ink-2); margin-top: 3px; }
+.notif-item .time { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+/* ---- Auth & setup ---- */
+.auth-screen { max-width: 420px; margin: 8vh auto; }
+.setup-screen { max-width: 660px; margin: 40px auto; }
+.setup-screen code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; }

@@ -1,0 +1,28 @@
+[
+  {"category":"Official (Free)","resources":[
+    {"title":"College Board Bluebook App","meta":"Official · Free · 6+ tests","desc":"Same format as real digital SAT. Take at least 6 full tests."},
+    {"title":"Khan Academy Official SAT Practice","meta":"Official partner · Free · Personalized","desc":"Links to College Board account. Targeted skill building."},
+    {"title":"College Board Question Bank","meta":"Official · Free · Topic-filtered","desc":"Drill weak areas by skill/domain."}
+  ]},
+  {"category":"Math (Target: 700+)","resources":[
+    {"title":"PWN the SAT: Math Guide","meta":"Book · Strategy","desc":"Great for jumping 600 → 700+."},
+    {"title":"Dr. John Chung's SAT Math","meta":"Book · Advanced","desc":"Hardest math practice. Final 2 weeks."},
+    {"title":"Target Test Prep (SAT Math)","meta":"Online · Paid · Structured","desc":"Comprehensive with analytics."}
+  ]},
+  {"category":"Reading & Writing (Target: 700+)","resources":[
+    {"title":"Erica Meltzer — The Critical Reader","meta":"Book · Reading","desc":"Gold standard for SAT reading."},
+    {"title":"Erica Meltzer — SAT Grammar","meta":"Book · Grammar","desc":"Every grammar rule tested."},
+    {"title":"1600.io","meta":"Online · Video walkthroughs","desc":"Detailed explanations of official tests."}
+  ]},
+  {"category":"Drills & Strategy","resources":[
+    {"title":"UWorld SAT","meta":"Online · Paid · High quality","desc":"Great explanations and analytics."},
+    {"title":"SAT Black Book","meta":"Book · Strategy","desc":"Exploit the test's design."}
+  ]},
+  {"category":"AI / CS Portfolio (5h/week)","resources":[
+    {"title":"fast.ai — Practical Deep Learning","meta":"Free course","desc":"Hands-on deep learning projects."},
+    {"title":"CS50 (Harvard)","meta":"Free · edX","desc":"CS fundamentals."},
+    {"title":"Kaggle Learn","meta":"Free · Micro-courses","desc":"Python, ML, data viz."},
+    {"title":"GitHub + Personal Website","meta":"Free · Portfolio","desc":"Showcase projects for US apps."},
+    {"title":"LeetCode / Codeforces","meta":"Free · Algorithms","desc":"Problem-solving for CS programs."}
+  ]}
+]

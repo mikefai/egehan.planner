@@ -7,11 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css?v=7">
-<link rel="stylesheet" href="css/base.css?v=7">
-<link rel="stylesheet" href="css/layout.css?v=7">
-<link rel="stylesheet" href="css/components.css?v=7">
-<link rel="stylesheet" href="css/admin.css?v=7">
+<link rel="stylesheet" href="css/tokens.css?v=8">
+<link rel="stylesheet" href="css/base.css?v=8">
+<link rel="stylesheet" href="css/layout.css?v=8">
+<link rel="stylesheet" href="css/components.css?v=8">
+<link rel="stylesheet" href="css/admin.css?v=8">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -167,6 +167,14 @@
     <!-- PORTFOLIO -->
     <section id="portfolio" class="section">
       <div class="page-head"><h2>Portfolio &amp; Self-Development</h2><p class="desc">Weekly target: 5 hours across AI/CS projects. This is what admissions committees see.</p></div>
+      <!-- Unlock gate: portfolio opens after the learner logs today's study -->
+      <div id="portLock" class="card hidden">
+        <h2>🔒 Portfolio locked</h2>
+        <p class="muted" style="font-size:14px;margin-bottom:12px">Log your study session for today to unlock your portfolio work. SAT prep first, then projects.</p>
+        <div id="portLockStatus" class="callout warn" style="margin-bottom:12px">No study logged today yet.</div>
+        <button class="btn" onclick="tryUnlockPortfolio()">Unlock Portfolio</button>
+      </div>
+      <div id="portfolioBody">
       <div class="card">
         <div class="row" style="justify-content:space-between;margin-bottom:8px">
           <h2 style="margin:0">Projects</h2>
@@ -186,12 +194,12 @@
           <div class="field"><label>Project</label><select id="portProject"></select></div>
           <div class="field"><label>Notes</label><input type="text" id="portNotes"></div>
         </div>
-        <div class="field"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" class="checkbox" id="portOverride"><span>Daily SAT study not completed (log anyway)</span></label></div>
         <button class="btn" onclick="addPortSession()">Log Hours</button>
       </div>
       <div class="card" style="margin-top:12px">
         <h2>Session History</h2>
         <div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Hours</th><th>Project</th><th>Notes</th><th></th></tr></thead><tbody id="portTable"></tbody></table></div>
+      </div>
       </div>
     </section>
 
@@ -399,13 +407,13 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/config.js?v=7"></script>
-<script src="js/state.js?v=7"></script>
-<script src="js/helpers.js?v=7"></script>
-<script src="js/api.js?v=7"></script>
-<script src="js/auth.js?v=7"></script>
-<script src="js/render.js?v=7"></script>
-<script src="js/admin.js?v=7"></script>
-<script src="js/app.js?v=7"></script>
+<script src="js/config.js?v=8"></script>
+<script src="js/state.js?v=8"></script>
+<script src="js/helpers.js?v=8"></script>
+<script src="js/api.js?v=8"></script>
+<script src="js/auth.js?v=8"></script>
+<script src="js/render.js?v=8"></script>
+<script src="js/admin.js?v=8"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>

@@ -241,6 +241,29 @@ function renderScores(){
 }
 
 // ---------- Portfolio ----------
+// Unlock rule: the portfolio page opens once the learner has logged at least one
+// study session for today (i.e. entered their daily study log). Admin bypasses.
+function portfolioUnlocked(){
+  if(isAdmin) return true;
+  return sessions.some(s=>s.date===todayStr());
+}
+function tryUnlockPortfolio(){
+  if(portfolioUnlocked()){ applyPortfolioLock(); toast('Portfolio unlocked'); }
+  else { toast('Log today\u2019s study session first (Study Log tab).'); }
+}
+function applyPortfolioLock(){
+  const unlocked = portfolioUnlocked();
+  document.getElementById('portLock').classList.toggle('hidden', unlocked);
+  document.getElementById('portfolioBody').classList.toggle('hidden', !unlocked);
+  const st = document.getElementById('portLockStatus');
+  if(st && !unlocked) st.textContent = 'No study logged today yet. Log a session in the Study Log tab to unlock.';
+  // lock indicator on the nav item
+  const navBtn = document.querySelector('nav button[data-tab="portfolio"]');
+  if(navBtn){
+    const ico = navBtn.querySelector('.ico');
+    if(ico) ico.textContent = unlocked ? '🤖' : '🔒';
+  }
+}
 function openProjModal(){ document.getElementById('projModal').classList.add('show'); }
 function saveProject(){
   const p = { user_id: currentUser.id, name: document.getElementById('pName').value.trim(), category: document.getElementById('pCat').value, status: document.getElementById('pStatus').value, target_hours: parseFloat(document.getElementById('pTarget').value)||0, description: document.getElementById('pDesc').value.trim(), progress: 0 };
@@ -261,15 +284,12 @@ function delProject(id){
 function setProjStatus(id,status){ sb.from('projects').update({status}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderAll(); } }); }
 function setProjProgress(id,val){ sb.from('projects').update({progress:Math.max(0,Math.min(100,val))}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderPortfolio(); } }); }
 function addPortSession(){
-  const daily = window.STUDENT?.dailyStudyHours||3;
-  const todayStudy = sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+s.hours,0);
-  const override = document.getElementById('portOverride').checked;
-  if(todayStudy>=daily && !override){ toast('Daily SAT study complete. Check override to log portfolio hours.'); return; }
+  if(!portfolioUnlocked()){ toast('Log today\u2019s study session first.'); return; }
   const ps = { user_id: currentUser.id, date: document.getElementById('portDate').value||todayStr(), hours: parseFloat(document.getElementById('portHours').value)||0, project: document.getElementById('portProject').value, notes: document.getElementById('portNotes').value.trim() };
   if(ps.hours<=0){ toast('Enter hours'); return; }
   sb.from('port_sessions').insert(ps).then(async ({error})=>{
     if(error){ toast(error.message); return; }
-    document.getElementById('portHours').value=''; document.getElementById('portNotes').value=''; document.getElementById('portOverride').checked=false;
+    document.getElementById('portHours').value=''; document.getElementById('portNotes').value='';
     await loadAll(); renderAll(); toast('Portfolio hours logged');
   });
 }
@@ -280,6 +300,7 @@ function delPort(id){
   });
 }
 function renderPortfolio(){
+  applyPortfolioLock();
   const daily = window.STUDENT?.dailyStudyHours||3;
   const weeklyPort = window.STUDENT?.weeklyPortfolioHours||5;
   const todayStudy = sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+s.hours,0);

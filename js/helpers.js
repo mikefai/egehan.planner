@@ -15,6 +15,24 @@ function guardWrite(){
   if(isAdmin && viewAsStudent){ toast('Read-only preview — exit preview to make changes.'); return true; }
   return false;
 }
+
+// Normalize a pasted link: add a scheme if missing; null if not URL-like.
+function normalizeUrl(raw){
+  let u = (raw||'').trim();
+  if(!u) return null;
+  if(!/^https?:\/\//i.test(u)){
+    if(/^[\w.-]+\.[a-z]{2,}(\/[^\s]*)?$/i.test(u)) u = 'https://'+u; else return null;
+  }
+  try { const x=new URL(u); if(!x.hostname || !x.hostname.includes('.')) return null; return x.href; }
+  catch { return null; }
+}
+// Best-effort human label for a URL attachment.
+function deriveLinkName(u){
+  try { const x=new URL(u); const seg=x.pathname.split('/').filter(Boolean).pop();
+    if(seg) return decodeURIComponent(seg).replace(/\.[a-z0-9]+$/i,'').replace(/[-_]+/g,' ').slice(0,48);
+    return x.hostname.replace(/^www\./,'');
+  } catch { return u.slice(0,48); }
+}
 function hoursBetween(s,e){
   if(!s||!e) return 0;
   const [sh,sm]=s.split(':').map(Number);

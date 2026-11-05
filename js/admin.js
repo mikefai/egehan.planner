@@ -55,14 +55,25 @@ function setAdminView(v){
 }
 
 // ---------- Attachments ----------
-function addAttachment(){
-  const name = document.getElementById('attName').value.trim();
-  const url = document.getElementById('attUrl').value.trim();
+// Stages a single attachment from the URL fields. Name is optional (auto-derived).
+// Returns true on success.
+function commitAttachmentUrl(){
+  const raw = document.getElementById('attUrl').value;
+  const url = normalizeUrl(raw);
+  if(!url){ return false; }
+  let name = document.getElementById('attName').value.trim();
+  if(!name) name = deriveLinkName(url);
   const type = document.getElementById('attType').value;
-  if(!name||!url){ toast('Name and URL required'); return; }
-  pendingAttachments.push({name,url,file_type:type});
+  pendingAttachments.push({ name, url, file_type:type });
   document.getElementById('attName').value=''; document.getElementById('attUrl').value='';
   renderPendingAttachments();
+  return true;
+}
+function addAttachment(){
+  const urlField = document.getElementById('attUrl').value.trim();
+  if(!urlField){ toast('Paste a URL first'); return; }
+  if(!commitAttachmentUrl()){ toast('That doesn\u2019t look like a valid link'); return; }
+  toast('Link added');
 }
 async function uploadAttachment(){
   const f = document.getElementById('attFile').files[0];
@@ -81,7 +92,7 @@ function renderPendingAttachments(){
   const el = document.getElementById('attachList');
   if(!el) return;
   if(pendingAttachments.length===0){ el.innerHTML='<div class="muted" style="font-size:12px">No attachments yet.</div>'; return; }
-  el.innerHTML = pendingAttachments.map((a,i)=>`<div class="row" style="margin-bottom:4px"><span class="attach">${iconFor(a.file_type)} ${escape(a.name)}</span><button class="btn danger sm" onclick="removeAttachment(${i})">✕</button></div>`).join('');
+  el.innerHTML = pendingAttachments.map((a,i)=>`<div class="row" style="margin-bottom:4px"><a class="attach" href="${escape(a.url)}" target="_blank" rel="noopener">${iconFor(a.file_type)} ${escape(a.name)}</a><button class="btn danger sm" onclick="removeAttachment(${i})" title="Remove">✕</button></div>`).join('');
 }
 function removeAttachment(i){ pendingAttachments.splice(i,1); renderPendingAttachments(); }
 
@@ -96,6 +107,10 @@ async function assignHomework(){
   const studentId = document.getElementById('hwStudent').value;
   if(!title){ toast('Title required'); return; }
   if(!studentId){ toast('Select a student'); return; }
+  // Don't silently drop a link the teacher typed but didn't click "Add link" on.
+  if(document.getElementById('attUrl').value.trim()){
+    if(!commitAttachmentUrl()){ toast('The link you typed isn\u2019t valid — fix it or clear it.'); return; }
+  }
   const { data: hw, error } = await sb.from('homework').insert({
     title, description: desc, category: cat, priority: prio, due_date: due,
     assigned_to: studentId, created_by: currentUser.id, status: 'assigned'
@@ -103,19 +118,21 @@ async function assignHomework(){
   if(error){ toast(error.message); return; }
   if(pendingAttachments.length){
     const rows = pendingAttachments.map(a=>({ homework_id: hw.id, name: a.name, url: a.url, file_type: a.file_type, storage_path: a.storage_path||null }));
-    await sb.from('homework_attachments').insert(rows);
+    const { error: attErr } = await sb.from('homework_attachments').insert(rows);
+    if(attErr){ toast('Saved, but the attachments failed: '+attErr.message); }
   }
   await sb.from('notifications').insert({
     user_id: studentId, type: 'homework_assigned',
     title: 'New homework assigned',
-    body: title + (due? ' · due '+due : ''),
+    body: title + (due? ' · due '+due : '') + (pendingAttachments.length? ` · ${pendingAttachments.length} attachment${pendingAttachments.length>1?'s':''}` : ''),
     link: 'assignments'
   });
+  const n = pendingAttachments.length;
   pendingAttachments = [];
   renderPendingAttachments();
   document.getElementById('hwTitle').value=''; document.getElementById('hwDesc').value=''; document.getElementById('hwDue').value='';
   closeModal('assignHwModal');
-  toast('Homework assigned');
+  toast('Homework assigned'+(n?` with ${n} attachment${n>1?'s':''}`:''));
   await loadAll(); renderAll();
 }
 

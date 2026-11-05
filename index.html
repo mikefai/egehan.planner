@@ -7,11 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css?v=12">
-<link rel="stylesheet" href="css/base.css?v=12">
-<link rel="stylesheet" href="css/layout.css?v=12">
-<link rel="stylesheet" href="css/components.css?v=12">
-<link rel="stylesheet" href="css/admin.css?v=12">
+<link rel="stylesheet" href="css/tokens.css?v=13">
+<link rel="stylesheet" href="css/base.css?v=13">
+<link rel="stylesheet" href="css/layout.css?v=13">
+<link rel="stylesheet" href="css/components.css?v=13">
+<link rel="stylesheet" href="css/admin.css?v=13">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -443,16 +443,16 @@
     <div class="panel" style="margin-bottom:10px">
       <h3 style="margin-top:0">Attachments (URLs, PDFs, videos, docs)</h3>
       <div id="attachList"></div>
+      <div class="field"><label>Link / URL</label><input id="attUrl" placeholder="https://… (paste any link)" onkeydown="if(event.key==='Enter'){event.preventDefault();addAttachment();}"></div>
       <div class="two-col">
-        <div class="field"><label>Name</label><input id="attName" placeholder="e.g. Test 2 PDF"></div>
-        <div class="field"><label>Type</label><select id="attType"><option value="pdf">PDF</option><option value="link">Link</option><option value="video">Video</option><option value="doc">Doc</option><option value="image">Image</option><option value="other">Other</option></select></div>
+        <div class="field"><label>Name <span class="muted" style="font-weight:400">(optional — auto-named from the link)</span></label><input id="attName" placeholder="e.g. Full Exam 1 PDF"></div>
+        <div class="field"><label>Type</label><select id="attType"><option value="link">Link</option><option value="pdf">PDF</option><option value="video">Video</option><option value="doc">Doc</option><option value="image">Image</option><option value="other">Other</option></select></div>
       </div>
-      <div class="field"><label>URL</label><input id="attUrl" placeholder="https://..."></div>
       <div class="row" style="gap:6px;margin-bottom:8px">
         <button class="btn secondary sm" onclick="addAttachment()">+ Add link</button>
         <label class="btn secondary sm" style="cursor:pointer;margin:0">📎 Upload file<input type="file" id="attFile" style="display:none" onchange="uploadAttachment()"></label>
       </div>
-      <p class="muted" style="font-size:12px">Paste any URL (Google Drive, Dropbox, direct PDF, YouTube) — or upload a file (free 1GB storage).</p>
+      <p class="muted" style="font-size:12px">Paste any URL (Google Drive, Dropbox, direct PDF, YouTube) — or upload a file (free 1GB storage). Press Enter to add a link.</p>
     </div>
     <button class="btn" onclick="assignHomework()">Assign Homework</button>
     <p id="hwMsg" style="font-size:12px;margin-top:8px"></p>
@@ -504,15 +504,15 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/config.js?v=12"></script>
-<script src="js/state.js?v=12"></script>
-<script src="js/helpers.js?v=12"></script>
-<script src="js/api.js?v=12"></script>
-<script src="js/auth.js?v=12"></script>
-<script src="js/render.js?v=12"></script>
-<script src="js/errorlog.js?v=12"></script>
-<script src="js/sessions.js?v=12"></script>
-<script src="js/admin.js?v=12"></script>
-<script src="js/app.js?v=12"></script>
+<script src="js/config.js?v=13"></script>
+<script src="js/state.js?v=13"></script>
+<script src="js/helpers.js?v=13"></script>
+<script src="js/api.js?v=13"></script>
+<script src="js/auth.js?v=13"></script>
+<script src="js/render.js?v=13"></script>
+<script src="js/errorlog.js?v=13"></script>
+<script src="js/sessions.js?v=13"></script>
+<script src="js/admin.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
 </body>
 </html>

@@ -17,6 +17,7 @@ function openErrorModal(){
 }
 
 function saveErrorEntry(){
+  if(guardWrite()) return;
   const entry = {
     user_id: currentUser.id,
     date: document.getElementById('eDate').value||todayStr(),
@@ -34,6 +35,7 @@ function saveErrorEntry(){
 }
 
 function cycleErrorStatus(id){
+  if(guardWrite()) return;
   const e = errorLog.find(x=>x.id===id); if(!e) return;
   const order = ['weak','improving','mastered'];
   const next = order[(order.indexOf(e.status)+1)%order.length];
@@ -44,6 +46,7 @@ function cycleErrorStatus(id){
 }
 
 function delErrorEntry(id){
+  if(guardWrite()) return;
   if(!confirm('Delete this error-log entry?')) return;
   sb.from('error_log').delete().eq('id',id).then(async ({error})=>{
     if(error){ toast(error.message); return; }

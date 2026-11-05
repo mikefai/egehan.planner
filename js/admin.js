@@ -2,6 +2,43 @@
 
 let adminView='overview';
 
+// ---------- View as student (read-only preview) ----------
+function updatePreviewSelector(){
+  const wrap = document.getElementById('previewWrap');
+  const sel = document.getElementById('previewSelect');
+  if(!wrap||!sel) return;
+  if(!isAdmin){ wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden');
+  sel.innerHTML = '<option value="">My own view</option>' +
+    students.map(s=>`<option value="${s.id}" ${viewAsStudent&&viewAsStudent.id===s.id?'selected':''}>${escape(s.display_name||s.email)}</option>`).join('');
+}
+
+async function togglePreview(studentId){
+  if(!isAdmin) return;
+  if(!studentId){ viewAsStudent = null; }
+  else { const s = students.find(x=>x.id===studentId); viewAsStudent = s||null; }
+  await applyPreviewChrome();
+  await loadAll();
+  renderAll();
+  if(viewAsStudent){
+    // jump to Assignments so the teacher lands on the student's homework board
+    document.querySelector('nav button[data-tab="assignments"]').click();
+    toast(`Viewing ${viewAsStudent.display_name||viewAsStudent.email}’s view`);
+  } else {
+    toast('Back to your admin view');
+  }
+}
+
+async function applyPreviewChrome(){
+  const on = !!(isAdmin && viewAsStudent);
+  document.body.classList.toggle('previewing', on);
+  const banner = document.getElementById('previewBanner');
+  if(banner){ banner.classList.toggle('hidden', !on); if(on) document.getElementById('previewName').textContent = viewAsStudent.display_name||viewAsStudent.email; }
+  // hide admin-only surfaces while previewing so the mirror is faithful
+  const adminTab = document.getElementById('adminTab'); if(adminTab) adminTab.classList.toggle('hidden', on || !isAdmin);
+  const addHw = document.getElementById('assignHwBtn'); if(addHw) addHw.style.display = on ? 'none' : (isAdmin?'':'none');
+}
+
 function setAdminView(v){
   adminView=v;
   ['overview','assign','grade','progress','message','data'].forEach(x=>{
@@ -50,6 +87,7 @@ function removeAttachment(i){ pendingAttachments.splice(i,1); renderPendingAttac
 
 // ---------- Assign homework ----------
 async function assignHomework(){
+  if(guardWrite()) return;
   const title = document.getElementById('hwTitle').value.trim();
   const desc = document.getElementById('hwDesc').value.trim();
   const cat = document.getElementById('hwCat').value;
@@ -92,6 +130,7 @@ function openGradeModal(id){
   document.getElementById('gradeModal').classList.add('show');
 }
 async function submitGrade(){
+  if(guardWrite()) return;
   const g = parseFloat(document.getElementById('gradeVal').value);
   const fb = document.getElementById('gradeFeedback').value.trim();
   const h = homework.find(x=>x.id===currentGradeHwId);
@@ -220,6 +259,7 @@ async function loadDataControl(){
   body.innerHTML = rows.map(r=>`<tr>${cols.map(c=>`<td>${escape(String(r[c]??''))}</td>`).join('')}<td><button class="btn danger sm" onclick="deleteRow('${table}','${r.id}')">✕</button></td></tr>`).join('');
 }
 async function deleteRow(table,id){
+  if(guardWrite()) return;
   if(!confirm('Delete this row?')) return;
   await sb.from(table).delete().eq('id',id);
   toast('Deleted');
@@ -324,6 +364,7 @@ function renderMessageView(){
 }
 
 async function sendMessage(){
+  if(guardWrite()) return;
   const to = document.getElementById('msgStudent').value;
   const title = document.getElementById('msgTitle').value.trim();
   const body = document.getElementById('msgBody').value.trim();

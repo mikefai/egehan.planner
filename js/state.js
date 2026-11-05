@@ -20,3 +20,4 @@ let errorLog = [];
 let oneOnOne = [];
 let oneOnOneMonth = new Date();
 let scoreSeries = 'total';
+let viewAsStudent = null;   // admin read-only preview of a student's view

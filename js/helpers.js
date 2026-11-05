@@ -10,6 +10,11 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+// Returns true when a mutation should be blocked because the admin is in read-only student preview.
+function guardWrite(){
+  if(isAdmin && viewAsStudent){ toast('Read-only preview — exit preview to make changes.'); return true; }
+  return false;
+}
 function hoursBetween(s,e){
   if(!s||!e) return 0;
   const [sh,sm]=s.split(':').map(Number);

@@ -172,6 +172,21 @@ tbody tr:hover td { background: var(--surface-2); }
 .setup-screen { max-width: 660px; margin: 40px auto; }
 .setup-screen code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
 
+/* ---- View-as-student preview (admin read-only) ---- */
+.preview-wrap { display: inline-flex; align-items: center; gap: 8px; }
+.preview-wrap .pw-label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.preview-wrap select { width: auto; padding: 6px 10px; font-size: 13px; }
+.preview-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap;
+  background: var(--violet-soft); border-bottom: 1px solid color-mix(in srgb, var(--violet) 25%, var(--line));
+  padding: 10px 24px; font-size: 13px; color: var(--violet);
+}
+.preview-banner b { color: var(--violet); }
+@media (max-width: 900px){ .preview-banner { padding: 10px 16px; } .preview-wrap .pw-label { display: none; } }
+/* In preview, mute the affordance of controls the learner—not the teacher—would use, while keeping them visible for fidelity. */
+body.previewing main button.btn:not(.btn-secondary-exit),
+body.previewing main .field, body.previewing main .seg, body.previewing main .mile-toggle, body.previewing main input, body.previewing main select, body.previewing main textarea { cursor: not-allowed; }
+
 /* Goals grouped (realistic / dreamy) */
 .goal-group { margin-bottom: var(--s-5); }
 .goal-group-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }

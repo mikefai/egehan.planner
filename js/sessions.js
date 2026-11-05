@@ -74,6 +74,7 @@ function renderSessionsCalendar(){
 
 function openProposeSession(dateStr){
   if(!isAdmin){ toast('Teacher only'); return; }
+  if(viewAsStudent){ toast('Exit student preview to schedule sessions.'); return; }
   document.getElementById('ssDate').value = dateStr || todayStr();
   document.getElementById('ssTopic').value=''; document.getElementById('ssNotes').value='';
   document.getElementById('ssStart').value=''; document.getElementById('ssEnd').value='';
@@ -81,6 +82,7 @@ function openProposeSession(dateStr){
 }
 
 async function proposeSession(){
+  if(guardWrite()) return;
   const date=document.getElementById('ssDate').value;
   const topic=document.getElementById('ssTopic').value.trim();
   const notes=document.getElementById('ssNotes').value.trim();
@@ -106,6 +108,7 @@ async function proposeSession(){
 }
 
 async function confirmSession(id){
+  if(guardWrite()) return;
   const s=oneOnOne.find(x=>x.id===id); if(!s) return;
   const { error } = await sb.from('sessions_1on1').update({ status:'confirmed', confirmed_at:new Date().toISOString() }).eq('id', id);
   if(error){ toast(error.message); return; }
@@ -118,6 +121,7 @@ async function confirmSession(id){
 }
 
 async function declineSession(id){
+  if(guardWrite()) return;
   const s=oneOnOne.find(x=>x.id===id); if(!s) return;
   const { error } = await sb.from('sessions_1on1').update({ status:'proposed', notes: (s.notes?s.notes+' | ':'')+'student requested reschedule' }).eq('id', id);
   if(error){ toast(error.message); return; }
@@ -130,6 +134,7 @@ async function declineSession(id){
 }
 
 async function cancelSession(id){
+  if(guardWrite()) return;
   if(!confirm('Cancel this session?')) return;
   const s=oneOnOne.find(x=>x.id===id); if(!s) return;
   const { error } = await sb.from('sessions_1on1').update({ status:'cancelled' }).eq('id', id);

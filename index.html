@@ -7,11 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css?v=11">
-<link rel="stylesheet" href="css/base.css?v=11">
-<link rel="stylesheet" href="css/layout.css?v=11">
-<link rel="stylesheet" href="css/components.css?v=11">
-<link rel="stylesheet" href="css/admin.css?v=11">
+<link rel="stylesheet" href="css/tokens.css?v=12">
+<link rel="stylesheet" href="css/base.css?v=12">
+<link rel="stylesheet" href="css/layout.css?v=12">
+<link rel="stylesheet" href="css/components.css?v=12">
+<link rel="stylesheet" href="css/admin.css?v=12">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -72,8 +72,17 @@
       <div class="sub">SAT prep · US university admissions · AI &amp; Computer Science</div>
     </div>
     <div class="spacer"></div>
+    <div id="previewWrap" class="preview-wrap hidden">
+      <span class="pw-label">👁 View as student</span>
+      <select id="previewSelect" onchange="togglePreview(this.value)" aria-label="View as student"></select>
+    </div>
     <div class="bell" onclick="toggleNotifPanel()">🔔<span class="badge hidden" id="notifBadge">0</span></div>
     <button class="btn secondary sm" onclick="doLogout()">Logout</button>
+  </div>
+
+  <div id="previewBanner" class="preview-banner hidden">
+    <span>👁 Previewing <b id="previewName"></b>’s view — read-only. Their data, their rules. Nothing you do here changes their account.</span>
+    <button class="btn secondary sm" onclick="togglePreview('')">Exit preview</button>
   </div>
 
   <main>
@@ -495,15 +504,15 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/config.js?v=11"></script>
-<script src="js/state.js?v=11"></script>
-<script src="js/helpers.js?v=11"></script>
-<script src="js/api.js?v=11"></script>
-<script src="js/auth.js?v=11"></script>
-<script src="js/render.js?v=11"></script>
-<script src="js/errorlog.js?v=11"></script>
-<script src="js/sessions.js?v=11"></script>
-<script src="js/admin.js?v=11"></script>
-<script src="js/app.js?v=11"></script>
+<script src="js/config.js?v=12"></script>
+<script src="js/state.js?v=12"></script>
+<script src="js/helpers.js?v=12"></script>
+<script src="js/api.js?v=12"></script>
+<script src="js/auth.js?v=12"></script>
+<script src="js/render.js?v=12"></script>
+<script src="js/errorlog.js?v=12"></script>
+<script src="js/sessions.js?v=12"></script>
+<script src="js/admin.js?v=12"></script>
+<script src="js/app.js?v=12"></script>
 </body>
 </html>

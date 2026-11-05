@@ -23,17 +23,18 @@ async function loadStudentData(){
 }
 
 async function loadAll(){
-  const uid = currentUser.id;
+  const preview = isAdmin && !!viewAsStudent;      // admin looking through a student's eyes
+  const uid = preview ? viewAsStudent.id : currentUser.id;
   const [s, sc, p, ps, g, hw, n, el] = await Promise.all([
     sb.from('study_sessions').select('*').eq('user_id', uid).order('date',{ascending:false}),
     sb.from('scores').select('*').eq('user_id', uid).order('date',{ascending:false}),
     sb.from('projects').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
     sb.from('port_sessions').select('*').eq('user_id', uid).order('date',{ascending:false}),
     sb.from('goals').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
-    isAdmin
+    (isAdmin && !preview)
       ? sb.from('homework').select('*').order('created_at',{ascending:false})
       : sb.from('homework').select('*').eq('assigned_to', uid).order('created_at',{ascending:false}),
-    sb.from('notifications').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
+    preview ? Promise.resolve({data:[]}) : sb.from('notifications').select('*').eq('user_id', uid).order('created_at',{ascending:false}),
     sb.from('error_log').select('*').eq('user_id', uid).order('date',{ascending:false}),
   ]);
   sessions = s.data||[];
@@ -45,14 +46,14 @@ async function loadAll(){
   notifications = n.data||[];
   errorLog = el.data||[];
 
-  // 1:1 sessions — teacher sees all, student sees their own
-  const sessQ = isAdmin
+  // 1:1 sessions — teacher sees all; student (or preview) sees that student's own
+  const sessQ = (isAdmin && !preview)
     ? sb.from('sessions_1on1').select('*').order('date',{ascending:false})
     : sb.from('sessions_1on1').select('*').eq('student_id', uid).order('date',{ascending:false});
   const { data: ss1 } = await sessQ;
   oneOnOne = ss1||[];
 
-  // Seed built-in goals for a brand-new student account
+  // Seed built-in goals for a brand-new student account (never while previewing)
   if(!isAdmin && goals.length===0 && window.GOALS_SEED && window.GOALS_SEED.length){
     const rows = window.GOALS_SEED.map(g=>({ user_id: uid, text: g.text, category: g.category, due_date: g.due_date||null, priority: g.priority||'med', done:false }));
     await sb.from('goals').insert(rows);
@@ -60,28 +61,25 @@ async function loadAll(){
     goals = seeded||[];
   }
 
+  // attachments for the homework currently in view
+  const ids = homework.map(h=>h.id);
+  if(ids.length){
+    const { data: atts } = await sb.from('homework_attachments').select('*').in('homework_id', ids);
+    hwAttachments = {};
+    (atts||[]).forEach(a => { (hwAttachments[a.homework_id]=hwAttachments[a.homework_id]||[]).push(a); });
+  } else { hwAttachments = {}; }
+
   if(isAdmin){
     const { data: studs } = await sb.from('profiles').select('*').eq('role','student');
     students = studs||[];
-    const ids = homework.map(h=>h.id);
-    if(ids.length){
-      const { data: atts } = await sb.from('homework_attachments').select('*').in('homework_id', ids);
-      hwAttachments = {};
-      (atts||[]).forEach(a => { (hwAttachments[a.homework_id]=hwAttachments[a.homework_id]||[]).push(a); });
-    }
     const opts = students.map(s=>`<option value="${s.id}">${escape(s.display_name||s.email)}</option>`).join('') || '<option value="">No students</option>';
     document.getElementById('hwStudent').innerHTML = opts;
     document.getElementById('progressStudent').innerHTML = opts;
     document.getElementById('dataStudentSel').innerHTML = opts;
     if(typeof renderSessionStudentOptions==='function') renderSessionStudentOptions();
-  } else {
-    const ids = homework.map(h=>h.id);
-    if(ids.length){
-      const { data: atts } = await sb.from('homework_attachments').select('*').in('homework_id', ids);
-      hwAttachments = {};
-      (atts||[]).forEach(a => { (hwAttachments[a.homework_id]=hwAttachments[a.homework_id]||[]).push(a); });
-    }
   }
+  if(typeof updatePreviewSelector==='function') updatePreviewSelector();
+  if(typeof applyPreviewChrome==='function') await applyPreviewChrome();
   updateNotifBadge();
 }
 

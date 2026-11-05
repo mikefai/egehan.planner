@@ -126,6 +126,7 @@ function openAssignHwModal(){
 }
 
 function savePersonalAssignment(){
+  if(guardWrite()) return;
   const statusMap = { todo:'assigned', doing:'submitted', done:'graded' };
   const hw = {
     title: document.getElementById('aTitle').value.trim(),
@@ -148,6 +149,7 @@ function savePersonalAssignment(){
 }
 
 function moveAssign(id, status){
+  if(guardWrite()) return;
   const patch = { status };
   if(status==='submitted'){ patch.submitted_at = new Date().toISOString(); }
   sb.from('homework').update(patch).eq('id', id).then(async ({error})=>{
@@ -157,6 +159,7 @@ function moveAssign(id, status){
 }
 
 function delAssign(id){
+  if(guardWrite()) return;
   if(!confirm('Delete this assignment?')) return;
   sb.from('homework').delete().eq('id', id).then(async ({error})=>{
     if(error){ toast(error.message); return; }
@@ -201,6 +204,7 @@ function renderAssignments(){
 
 // ---------- Study Log ----------
 function addSession(){
+  if(guardWrite()) return;
   const start = document.getElementById('logStart').value;
   const end = document.getElementById('logEnd').value;
   const hours = hoursBetween(start,end);
@@ -214,6 +218,7 @@ function addSession(){
 }
 
 function delSession(id){
+  if(guardWrite()) return;
   sb.from('study_sessions').delete().eq('id',id).then(async ({error})=>{
     if(error){ toast(error.message); return; }
     await loadAll(); renderAll();
@@ -232,6 +237,7 @@ function renderSessions(){
 
 // ---------- Scores ----------
 function addScore(){
+  if(guardWrite()) return;
   const sc = { user_id: currentUser.id, date: document.getElementById('scoreDate').value||todayStr(), total: parseInt(document.getElementById('scoreTotal').value)||0, math: parseInt(document.getElementById('scoreMath').value)||0, rw: parseInt(document.getElementById('scoreRW').value)||0, notes: document.getElementById('scoreNotes').value.trim() };
   if(sc.total<400){ toast('Enter total score'); return; }
   sb.from('scores').insert(sc).then(async ({error})=>{
@@ -242,6 +248,7 @@ function addScore(){
 }
 
 function delScore(id){
+  if(guardWrite()) return;
   sb.from('scores').delete().eq('id',id).then(async ({error})=>{
     if(error){ toast(error.message); return; }
     await loadAll(); renderAll();
@@ -456,7 +463,7 @@ function renderScores(){
 // Unlock rule: the portfolio page opens once the learner has logged at least one
 // study session for today (i.e. entered their daily study log). Admin bypasses.
 function portfolioUnlocked(){
-  if(isAdmin) return true;
+  if(isAdmin && !viewAsStudent) return true;
   return sessions.some(s=>s.date===todayStr());
 }
 function tryUnlockPortfolio(){
@@ -478,6 +485,7 @@ function applyPortfolioLock(){
 }
 function openProjModal(){ document.getElementById('projModal').classList.add('show'); }
 function saveProject(){
+  if(guardWrite()) return;
   const p = { user_id: currentUser.id, name: document.getElementById('pName').value.trim(), category: document.getElementById('pCat').value, status: document.getElementById('pStatus').value, target_hours: parseFloat(document.getElementById('pTarget').value)||0, description: document.getElementById('pDesc').value.trim(), progress: 0 };
   if(!p.name){ toast('Name required'); return; }
   sb.from('projects').insert(p).then(async ({error})=>{
@@ -488,14 +496,16 @@ function saveProject(){
   });
 }
 function delProject(id){
+  if(guardWrite()) return;
   sb.from('projects').delete().eq('id',id).then(async ({error})=>{
     if(error){ toast(error.message); return; }
     await loadAll(); renderAll();
   });
 }
-function setProjStatus(id,status){ sb.from('projects').update({status}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderAll(); } }); }
-function setProjProgress(id,val){ sb.from('projects').update({progress:Math.max(0,Math.min(100,val))}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderPortfolio(); } }); }
+function setProjStatus(id,status){ if(guardWrite()) return; sb.from('projects').update({status}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderAll(); } }); }
+function setProjProgress(id,val){ if(guardWrite()) return; sb.from('projects').update({progress:Math.max(0,Math.min(100,val))}).eq('id',id).then(async ({error})=>{ if(error) toast(error.message); else { await loadAll(); renderPortfolio(); } }); }
 function addPortSession(){
+  if(guardWrite()) return;
   if(!portfolioUnlocked()){ toast('Log today\u2019s study session first.'); return; }
   const ps = { user_id: currentUser.id, date: document.getElementById('portDate').value||todayStr(), hours: parseFloat(document.getElementById('portHours').value)||0, project: document.getElementById('portProject').value, notes: document.getElementById('portNotes').value.trim() };
   if(ps.hours<=0){ toast('Enter hours'); return; }
@@ -506,6 +516,7 @@ function addPortSession(){
   });
 }
 function delPort(id){
+  if(guardWrite()) return;
   sb.from('port_sessions').delete().eq('id',id).then(async ({error})=>{
     if(error){ toast(error.message); return; }
     await loadAll(); renderAll();
@@ -551,6 +562,7 @@ let goalView='list';
 function setGoalView(v){ goalView=v; document.getElementById('goalListBtn').classList.toggle('active',v==='list'); document.getElementById('goalCalBtn').classList.toggle('active',v==='calendar'); renderGoals(); }
 function openGoalModal(){ document.getElementById('goalModal').classList.add('show'); }
 function saveGoal(){
+  if(guardWrite()) return;
   const g = { user_id: currentUser.id, text: document.getElementById('gText').value.trim(), category: document.getElementById('gCat').value, due_date: document.getElementById('gDate').value||null, priority: document.getElementById('gPrio').value, done:false };
   if(!g.text){ toast('Goal required'); return; }
   sb.from('goals').insert(g).then(async ({error})=>{
@@ -560,6 +572,7 @@ function saveGoal(){
   });
 }
 function toggleGoal(i){
+  if(guardWrite()) return;
   const g = goals[i];
   sb.from('goals').update({done:!g.done}).eq('id',g.id).then(async ({error})=>{
     if(error){ toast(error.message); return; }
@@ -567,6 +580,7 @@ function toggleGoal(i){
   });
 }
 function delGoal(i){
+  if(guardWrite()) return;
   const g = goals[i];
   sb.from('goals').delete().eq('id',g.id).then(async ({error})=>{
     if(error){ toast(error.message); return; }
